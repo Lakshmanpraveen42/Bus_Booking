@@ -1,0 +1,129 @@
+import React, { Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ChatWidget from './components/chatbot/ChatWidget';
+import ScrollToTop from './components/utils/ScrollToTop';
+import { useAuthStore } from './store/useAuthStore';
+import {
+  RequireSearch,
+  RequireBus,
+  RequireSeats,
+  RequireBookingSuccess,
+  RequireAdmin,
+} from './guards/RouteGuard';
+
+// Pages
+import Home from './pages/Home';
+import BusListing from './pages/BusListing';
+import SeatSelection from './pages/SeatSelection';
+import Checkout from './pages/Checkout';
+import BookingConfirmation from './pages/BookingConfirmation';
+import Contact from './pages/Contact';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfUse from './pages/TermsOfUse';
+import CookiePolicy from './pages/CookiePolicy';
+import HelpCenter from './pages/HelpCenter';
+import SafetyGuide from './pages/SafetyGuide';
+import Cancellation from './pages/Cancellation';
+import FAQ from './pages/FAQ';
+import Insurance from './pages/Insurance';
+import AboutUs from './pages/AboutUs';
+import BusPartners from './pages/BusPartners';
+import Careers from './pages/Careers';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import MyBookings from './pages/MyBookings';
+import AdminDashboard from './pages/admin/Dashboard';
+import ManageBuses from './pages/admin/ManageBuses';
+import ManageRoutes from './pages/admin/ManageRoutes';
+import AllBookings from './pages/admin/AllBookings';
+import NotFound from './pages/NotFound';
+
+const App = () => {
+  const init = useAuthStore((s) => s.init);
+
+  useEffect(() => {
+    init();
+  }, [init]);
+
+  return (
+    <BrowserRouter>
+      {/* Utility: Always scroll to top on navigation */}
+      <ScrollToTop />
+
+      {/* ChatWidget is rendered globally — visible on all pages */}
+      <ChatWidget />
+
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<Home />} />
+
+        {/* Guarded: requires searchParams */}
+        <Route
+          path="/buses"
+          element={
+            <RequireSearch>
+              <BusListing />
+            </RequireSearch>
+          }
+        />
+
+        {/* Guarded: requires selectedBus */}
+        <Route
+          path="/seats/:tripId"
+          element={
+            <RequireBus>
+              <SeatSelection />
+            </RequireBus>
+          }
+        />
+
+        {/* Guarded: requires selectedBus + at least 1 selectedSeat */}
+        <Route
+          path="/checkout"
+          element={
+            <RequireSeats>
+              <Checkout />
+            </RequireSeats>
+          }
+        />
+
+        {/* Guarded: requires bookingStatus === 'success' */}
+        <Route
+          path="/confirmation"
+          element={
+            <RequireBookingSuccess>
+              <BookingConfirmation />
+            </RequireBookingSuccess>
+          }
+        />
+
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfUse />} />
+        <Route path="/cookies" element={<CookiePolicy />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/safety" element={<SafetyGuide />} />
+        <Route path="/cancellation" element={<Cancellation />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/insurance" element={<Insurance />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/partners" element={<BusPartners />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
+
+        {/* Admin */}
+        <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
+        <Route path="/admin/buses" element={<RequireAdmin><ManageBuses /></RequireAdmin>} />
+        <Route path="/admin/routes" element={<RequireAdmin><ManageRoutes /></RequireAdmin>} />
+        <Route path="/admin/bookings" element={<RequireAdmin><AllBookings /></RequireAdmin>} />
+
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;

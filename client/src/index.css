@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply font-sans bg-background text-slate-800 antialiased overflow-x-hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold leading-tight;
+  }
+
+  input, select, textarea {
+    @apply outline-none;
+  }
+}
+
+@layer components {
+  /* Scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-slate-100 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full hover:bg-slate-400;
+  }
+
+  /* Professional Bus Seats */
+  .bus-seat {
+    @apply relative flex items-center justify-center transition-all duration-200 cursor-pointer text-[10px] font-bold border-2;
+  }
+  
+  /* Seater headrest */
+  .bus-seat::before {
+    content: '';
+    @apply absolute -top-1 left-1.5 right-1.5 h-1.5 rounded-t-sm opacity-40;
+  }
+
+  /* Sleeper pillow */
+  .bus-sleeper::after {
+    content: '';
+    @apply absolute top-1.5 bottom-1.5 left-1 w-2 rounded-sm opacity-30;
+  }
+
+  .seat-available {
+    @apply bg-white border-slate-300 text-slate-600 hover:border-primary-500 hover:bg-primary-50 hover:shadow-sm;
+  }
+  .seat-available::before, .seat-available::after { @apply bg-slate-400; }
+
+  .seat-selected {
+    @apply bg-primary-500 border-primary-600 text-white shadow-lg shadow-primary-500/20 scale-[1.05];
+  }
+  .seat-selected::before, .seat-selected::after { @apply bg-white; }
+
+  .seat-booked {
+    @apply bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-60;
+  }
+  .seat-booked::before, .seat-booked::after { @apply bg-slate-300; }
+
+  /* Card hover */
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  /* Gradient hero */
+  .hero-gradient {
+    background: radial-gradient(circle at 20% 30%, rgba(239, 68, 68, 0.12), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(249, 115, 22, 0.08), transparent 40%),
+                #0f172a;
+  }
+
+  /* Glass effect */
+  .glass {
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  /* Professional Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+  .animate-slide-in-right {
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-reveal {
+    animation: reveal 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  }
+
+  /* Shimmer animation for skeletons */
+  .shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-accent-500;
+  }
+  .bg-glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl;
+  }
+  .container-max {
+    @apply max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

@@ -1,0 +1,243 @@
+{
+  "trip-001": {
+    "tripId": "trip-001",
+    "layout": "2+2",
+    "totalRows": 10,
+    "decks": ["lower"],
+    "seats": [
+      { "id": "1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "1D", "row": 1, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "2A", "row": 2, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "2B", "row": 2, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "2C", "row": 2, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "2D", "row": 2, "col": "D", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "3A", "row": 3, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "3B", "row": 3, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "3C", "row": 3, "col": "C", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "3D", "row": 3, "col": "D", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "4A", "row": 4, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "4B", "row": 4, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "4C", "row": 4, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "4D", "row": 4, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "5A", "row": 5, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "5B", "row": 5, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "5C", "row": 5, "col": "C", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "5D", "row": 5, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "6A", "row": 6, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "6B", "row": 6, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "6C", "row": 6, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "6D", "row": 6, "col": "D", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "7A", "row": 7, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "7B", "row": 7, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "7C", "row": 7, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "7D", "row": 7, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "8A", "row": 8, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "8B", "row": 8, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "8C", "row": 8, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "8D", "row": 8, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "9A", "row": 9, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "9B", "row": 9, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "9C", "row": 9, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "9D", "row": 9, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "10A", "row": 10, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "10B", "row": 10, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "10C", "row": 10, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "10D", "row": 10, "col": "D", "side": "right", "deck": "lower", "status": "available" }
+    ]
+  },
+  "trip-002": {
+    "tripId": "trip-002",
+    "layout": "2+1",
+    "totalRows": 10,
+    "decks": ["lower", "upper"],
+    "seats": [
+      { "id": "L1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "L1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "L2A", "row": 2, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L2B", "row": 2, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "L2C", "row": 2, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "L3A", "row": 3, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L3B", "row": 3, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L3C", "row": 3, "col": "C", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "L4A", "row": 4, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "L4B", "row": 4, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L4C", "row": 4, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "L5A", "row": 5, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L5B", "row": 5, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L5C", "row": 5, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "U1A", "row": 1, "col": "A", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U1B", "row": 1, "col": "B", "side": "left", "deck": "upper", "status": "booked" },
+      { "id": "U1C", "row": 1, "col": "C", "side": "right", "deck": "upper", "status": "available" },
+      { "id": "U2A", "row": 2, "col": "A", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U2B", "row": 2, "col": "B", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U2C", "row": 2, "col": "C", "side": "right", "deck": "upper", "status": "booked" },
+      { "id": "U3A", "row": 3, "col": "A", "side": "left", "deck": "upper", "status": "booked" },
+      { "id": "U3B", "row": 3, "col": "B", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U3C", "row": 3, "col": "C", "side": "right", "deck": "upper", "status": "available" },
+      { "id": "U4A", "row": 4, "col": "A", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U4B", "row": 4, "col": "B", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U4C", "row": 4, "col": "C", "side": "right", "deck": "upper", "status": "available" },
+      { "id": "U5A", "row": 5, "col": "A", "side": "left", "deck": "upper", "status": "booked" },
+      { "id": "U5B", "row": 5, "col": "B", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U5C", "row": 5, "col": "C", "side": "right", "deck": "upper", "status": "available" }
+    ]
+  },
+  "trip-003": {
+    "tripId": "trip-003",
+    "layout": "2+2",
+    "totalRows": 11,
+    "decks": ["lower"],
+    "seats": [
+      { "id": "1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "1D", "row": 1, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "2A", "row": 2, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "2B", "row": 2, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "2C", "row": 2, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "2D", "row": 2, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "3A", "row": 3, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "3B", "row": 3, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "3C", "row": 3, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "3D", "row": 3, "col": "D", "side": "right", "deck": "lower", "status": "available" }
+    ]
+  },
+  "trip-004": {
+    "tripId": "trip-004",
+    "layout": "2+2",
+    "totalRows": 10,
+    "decks": ["lower"],
+    "seats": [
+      { "id": "1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "1D", "row": 1, "col": "D", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "2A", "row": 2, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "2B", "row": 2, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "2C", "row": 2, "col": "C", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "2D", "row": 2, "col": "D", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "3A", "row": 3, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "3B", "row": 3, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "3C", "row": 3, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "3D", "row": 3, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "4A", "row": 4, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "4B", "row": 4, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "4C", "row": 4, "col": "C", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "4D", "row": 4, "col": "D", "side": "right", "deck": "lower", "status": "available" }
+    ]
+  },
+  "trip-005": {
+    "tripId": "trip-005",
+    "layout": "2+1",
+    "totalRows": 12,
+    "decks": ["lower", "upper"],
+    "seats": [
+      { "id": "L1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "L2A", "row": 2, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L2B", "row": 2, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "L2C", "row": 2, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "L3A", "row": 3, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L3B", "row": 3, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L3C", "row": 3, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "U1A", "row": 1, "col": "A", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U1B", "row": 1, "col": "B", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U1C", "row": 1, "col": "C", "side": "right", "deck": "upper", "status": "booked" },
+      { "id": "U2A", "row": 2, "col": "A", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U2B", "row": 2, "col": "B", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U2C", "row": 2, "col": "C", "side": "right", "deck": "upper", "status": "available" }
+    ]
+  },
+  "trip-006": {
+    "tripId": "trip-006",
+    "layout": "2+2",
+    "totalRows": 10,
+    "decks": ["lower"],
+    "seats": [
+      { "id": "1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "booked" },
+      { "id": "1D", "row": 1, "col": "D", "side": "right", "deck": "lower", "status": "booked" }
+    ]
+  },
+  "trip-007": {
+    "tripId": "trip-007",
+    "layout": "2+2",
+    "totalRows": 11,
+    "decks": ["lower"],
+    "seats": [
+      { "id": "1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "1D", "row": 1, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "2A", "row": 2, "col": "A", "side": "left", "deck": "lower", "status": "booked" },
+      { "id": "2B", "row": 2, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "2C", "row": 2, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "2D", "row": 2, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "3A", "row": 3, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "3B", "row": 3, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "3C", "row": 3, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "3D", "row": 3, "col": "D", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "4A", "row": 4, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "4B", "row": 4, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "4C", "row": 4, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "4D", "row": 4, "col": "D", "side": "right", "deck": "lower", "status": "available" }
+    ]
+  },
+  "trip-008": {
+    "tripId": "trip-008",
+    "layout": "2+2",
+    "totalRows": 10,
+    "decks": ["lower"],
+    "seats": [
+      { "id": "1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "1D", "row": 1, "col": "D", "side": "right", "deck": "lower", "status": "available" }
+    ]
+  },
+  "trip-009": {
+    "tripId": "trip-009",
+    "layout": "2+1",
+    "totalRows": 10,
+    "decks": ["lower", "upper"],
+    "seats": [
+      { "id": "L1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "U1A", "row": 1, "col": "A", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U1B", "row": 1, "col": "B", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U1C", "row": 1, "col": "C", "side": "right", "deck": "upper", "status": "available" }
+    ]
+  },
+  "trip-010": {
+    "tripId": "trip-010",
+    "layout": "2+2",
+    "totalRows": 10,
+    "decks": ["lower"],
+    "seats": [
+      { "id": "1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "1D", "row": 1, "col": "D", "side": "right", "deck": "lower", "status": "available" }
+    ]
+  },
+  "trip-011": {
+    "tripId": "trip-011",
+    "layout": "2+1",
+    "totalRows": 10,
+    "decks": ["lower", "upper"],
+    "seats": [
+      { "id": "L1A", "row": 1, "col": "A", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L1B", "row": 1, "col": "B", "side": "left", "deck": "lower", "status": "available" },
+      { "id": "L1C", "row": 1, "col": "C", "side": "right", "deck": "lower", "status": "available" },
+      { "id": "U1A", "row": 1, "col": "A", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U1B", "row": 1, "col": "B", "side": "left", "deck": "upper", "status": "available" },
+      { "id": "U1C", "row": 1, "col": "C", "side": "right", "deck": "upper", "status": "available" }
+    ]
+  }
+}
