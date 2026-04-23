@@ -33,7 +33,7 @@ const classifyMessage = (message) => {
  *   return { text: res.choices[0].message.content }
  */
 export const chatService = {
-  async sendMessage(userMessage) {
+  async sendMessage(userMessage, history = []) {
     if (USE_MOCK) {
       await delay(TYPING_DELAY);
       const key = classifyMessage(userMessage);
@@ -43,10 +43,17 @@ export const chatService = {
 
     // ─── Real API (NLP backend) ───
     try {
+      const { useAuthStore } = await import('../store/useAuthStore');
+      const userId = useAuthStore.getState().user?.id;
+
       const res = await fetch(`${API_BASE_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ 
+          message: userMessage,
+          user_id: userId,
+          history: history 
+        }),
       });
       if (!res.ok) throw new Error('Chat service unavailable');
       const json = await res.json();

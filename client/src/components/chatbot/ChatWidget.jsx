@@ -101,9 +101,13 @@ const ChatWidget = () => {
     const response = await sendMessage(reply);
     if (response?.action === 'search_trips') {
       setTimeout(() => navigate('/buses'), 1500);
+    } else if (response?.action === 'navigate_to_login' || reply === 'Login Now') {
+      navigate('/login');
+    } else if (reply === 'Sign Up') {
+      navigate('/signup');
     } else if (reply === 'View Results') {
       navigate('/buses');
-    } else if (reply === 'Yes, take me there') {
+    } else if (reply === 'Yes, take me there' || reply === 'Go to My Bookings') {
       navigate('/my-bookings');
     }
   };

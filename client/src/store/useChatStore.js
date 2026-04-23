@@ -39,7 +39,14 @@ export const useChatStore = create((set, get) => ({
     }));
 
     try {
-      const response = await chatService.sendMessage(text);
+      // Get current history to send to AI
+      const currentMessages = get().messages;
+      const history = currentMessages.map(m => ({
+        role: m.sender === CHAT_SENDER.BOT ? 'assistant' : 'user',
+        content: m.text
+      })).slice(-10); // Send last 10 messages
+
+      const response = await chatService.sendMessage(text, history);
       const { text: replyText, quickReplies, action, data } = response;
       
       const botMsg = makeMessage(replyText, CHAT_SENDER.BOT, quickReplies ?? []);
