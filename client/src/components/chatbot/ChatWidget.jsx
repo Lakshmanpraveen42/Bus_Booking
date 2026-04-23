@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MessageCircle, X, Send, Bot, Minimize2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useChatStore } from '../../store/useChatStore';
 import { CHAT_SENDER } from '../../utils/constants';
 import { formatTime12h } from '../../utils/formatters';
@@ -75,6 +76,7 @@ const ChatWidget = () => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const navigate = useNavigate();
 
   // Auto-scroll to bottom on new message
   useEffect(() => {
@@ -93,6 +95,17 @@ const ChatWidget = () => {
     if (!text) return;
     setInput('');
     sendMessage(text);
+  };
+
+  const handleQuickReply = async (reply) => {
+    const response = await sendMessage(reply);
+    if (response?.action === 'search_trips') {
+      setTimeout(() => navigate('/buses'), 1500);
+    } else if (reply === 'View Results') {
+      navigate('/buses');
+    } else if (reply === 'Yes, take me there') {
+      navigate('/my-bookings');
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -138,7 +151,7 @@ const ChatWidget = () => {
                 {msg.sender === CHAT_SENDER.BOT && msg === lastBotMessage && !isTyping && (
                   <QuickReplies
                     replies={msg.quickReplies}
-                    onSelect={(r) => sendMessage(r)}
+                    onSelect={handleQuickReply}
                   />
                 )}
               </div>

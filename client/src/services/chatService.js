@@ -41,15 +41,25 @@ export const chatService = {
       return { text, quickReplies: key === 'default' ? chatData.quickReplies : [] };
     }
 
-    // ─── Real API (OpenAI or custom NLP endpoint) ───
-    const res = await fetch(`${API_BASE_URL}/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: userMessage }),
-    });
-    if (!res.ok) throw new Error('Chat service unavailable');
-    const json = await res.json();
-    return { text: json.reply ?? json.text, quickReplies: json.quickReplies ?? [] };
+    // ─── Real API (NLP backend) ───
+    try {
+      const res = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage }),
+      });
+      if (!res.ok) throw new Error('Chat service unavailable');
+      const json = await res.json();
+      return { 
+        text: json.reply, 
+        quickReplies: json.quick_replies || [],
+        action: json.action,
+        data: json.data 
+      };
+    } catch (error) {
+      console.error('Chat error:', error);
+      return { text: "I'm having trouble connecting to my brain right now. Please try again later! 🤖" };
+    }
   },
 
   getQuickReplies() {

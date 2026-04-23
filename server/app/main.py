@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.api import auth, trips, admin, bookings
+from app.api import auth, trips, admin, bookings, chat
 from app.db.session import engine, Base
 from app.core.config import settings
 from app.core.logging_middleware import LoggingMiddleware
@@ -38,6 +38,7 @@ app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Aut
 app.include_router(trips.router, prefix=f"{settings.API_V1_STR}/trips", tags=["Trips"])
 app.include_router(bookings.router, prefix=f"{settings.API_V1_STR}/bookings", tags=["Bookings"])
 app.include_router(admin.router, prefix=f"{settings.API_V1_STR}/admin", tags=["Admin Dashboard"])
+app.include_router(chat.router, prefix=f"{settings.API_V1_STR}/chat", tags=["Chatbot AI"])
 
 @app.get("/")
 def root():

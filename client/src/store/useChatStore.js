@@ -39,7 +39,9 @@ export const useChatStore = create((set, get) => ({
     }));
 
     try {
-      const { text: replyText, quickReplies } = await chatService.sendMessage(text);
+      const response = await chatService.sendMessage(text);
+      const { text: replyText, quickReplies, action, data } = response;
+      
       const botMsg = makeMessage(replyText, CHAT_SENDER.BOT, quickReplies ?? []);
 
       set((state) => ({
@@ -47,7 +49,21 @@ export const useChatStore = create((set, get) => ({
         isTyping: false,
         unreadCount: state.isOpen ? 0 : state.unreadCount + 1,
       }));
-    } catch {
+
+      // Handle Actions
+      if (action === 'search_trips' && data) {
+        // We set the search params so the user can just go to /buses
+        const { useBookingStore } = await import('./useBookingStore');
+        useBookingStore.getState().setSearchParams({
+          from: data.source,
+          to: data.destination,
+          date: data.date
+        });
+      }
+      
+      return response; // Return full response in case UI needs it
+    } catch (error) {
+      console.error('Chat error:', error);
       const errorMsg = makeMessage(
         "Sorry, I'm having trouble connecting right now. Please try again shortly.",
         CHAT_SENDER.BOT

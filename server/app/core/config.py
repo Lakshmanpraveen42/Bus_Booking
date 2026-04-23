@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # Mail Config (SMTP)
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
-    MAIL_FROM: str = ""
+    MAIL_FROM: str = "noreply@busgo.com"
     MAIL_PORT: int = 587
     MAIL_SERVER: str = "smtp.gmail.com"
     MAIL_FROM_NAME: str = "BusGo Support"
