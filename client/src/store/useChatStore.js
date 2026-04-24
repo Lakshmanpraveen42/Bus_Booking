@@ -2,19 +2,22 @@ import { create } from 'zustand';
 import { CHAT_SENDER } from '../utils/constants';
 import { chatService } from '../services/chatService';
 import { generateMsgId } from '../utils/generators';
+import { useAuthStore } from './useAuthStore';
 
-const makeMessage = (text, sender, quickReplies = []) => ({
+const makeMessage = (text, sender, extra = {}) => ({
   id: generateMsgId(),
   text,
   sender,
-  quickReplies,
+  quickReplies: extra.quickReplies || [],
+  action: extra.action || null,
+  actionData: extra.actionData || null,
   timestamp: new Date(),
 });
 
 const INITIAL_BOT_MSG = makeMessage(
-  "Hi! 👋 I'm your BusGo travel assistant. How can I help you today?",
+  "Hi! 👋 I'm your SmartBus travel assistant. How can I help you today?",
   CHAT_SENDER.BOT,
-  chatService.getQuickReplies()
+  { quickReplies: ["Book a Ticket", "Festival Specials"] }
 );
 
 export const useChatStore = create((set, get) => ({
@@ -26,7 +29,6 @@ export const useChatStore = create((set, get) => ({
   toggleChat: () => {
     const { isOpen } = get();
     set({ isOpen: !isOpen, unreadCount: isOpen ? 0 : get().unreadCount });
-    if (!isOpen) set({ unreadCount: 0 });
   },
 
   sendMessage: async (text) => {
@@ -40,17 +42,31 @@ export const useChatStore = create((set, get) => ({
 
     try {
       const { messages } = get();
-      const { text: replyText, quickReplies } = await chatService.sendMessage(text, messages);
-      const botMsg = makeMessage(replyText, CHAT_SENDER.BOT, quickReplies ?? []);
+      const currentUser = useAuthStore.getState().user;
+      
+      const response = await chatService.sendMessage(
+        text, 
+        messages, 
+        currentUser?.id
+      );
+
+      const botMsg = makeMessage(response.text, CHAT_SENDER.BOT, {
+        quickReplies: response.quickReplies,
+        action: response.action,
+        actionData: response.actionData
+      });
 
       set((state) => ({
         messages: [...state.messages, botMsg],
         isTyping: false,
         unreadCount: state.isOpen ? 0 : state.unreadCount + 1,
       }));
-    } catch {
+
+      return botMsg; // Return for immediate action handling if needed
+    } catch (err) {
+      console.error(err);
       const errorMsg = makeMessage(
-        "Sorry, I'm having trouble connecting right now. Please try again shortly.",
+        "I'm having trouble connecting to my brain right now. 🧠 Just a second...",
         CHAT_SENDER.BOT
       );
       set((state) => ({

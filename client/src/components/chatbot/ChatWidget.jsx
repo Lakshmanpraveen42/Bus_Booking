@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MessageCircle, X, Send, Bot, Minimize2 } from 'lucide-react';
 import { useChatStore } from '../../store/useChatStore';
+import { useBookingStore } from '../../store/useBookingStore';
+import { useNavigate } from 'react-router-dom';
 import { CHAT_SENDER } from '../../utils/constants';
 import { formatTime12h } from '../../utils/formatters';
 
@@ -72,9 +74,69 @@ const QuickReplies = ({ replies, onSelect }) => {
  */
 const ChatWidget = () => {
   const { messages, isOpen, isTyping, unreadCount, toggleChat, sendMessage } = useChatStore();
+  const setSearchParams = useBookingStore(s => s.setSearchParams);
+  const navigate = useNavigate();
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const processedActions = useRef(new Set());
+
+  // Handle bot actions
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.sender === CHAT_SENDER.BOT && lastMsg.action && !processedActions.current.has(lastMsg.id)) {
+      processedActions.current.add(lastMsg.id);
+      
+      console.log('🤖 Bot Action:', lastMsg.action, lastMsg.actionData);
+
+      switch (lastMsg.action) {
+        case 'navigate_to_login':
+          navigate('/login');
+          break;
+        case 'navigate_to_bookings':
+          navigate('/my-bookings');
+          break;
+        case 'navigate_to_checkout':
+          navigate('/checkout');
+          break;
+        case 'navigate_to_cancel':
+          if (lastMsg.actionData?.booking_id) {
+            navigate(`/cancel-booking/${lastMsg.actionData.booking_id}`);
+          }
+          break;
+        case 'select_bus':
+          if (lastMsg.actionData?.trip) {
+            // Need to map tripp_id to tripId for the store
+            const trip = {
+              ...lastMsg.actionData.trip,
+              tripId: lastMsg.actionData.trip.trip_id
+            };
+            useBookingStore.getState().selectBus(trip);
+            navigate(`/seats/${trip.tripId}`);
+          }
+          break;
+        case 'search_trips':
+          if (lastMsg.actionData?.source && lastMsg.actionData?.destination) {
+            setSearchParams({
+              source: lastMsg.actionData.source,
+              destination: lastMsg.actionData.destination,
+              date: lastMsg.actionData.date || new Date().toISOString().split('T')[0]
+            });
+            navigate('/buses');
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  }, [messages, navigate, setSearchParams]);
+
+  const handleSend = () => {
+    const text = input.trim();
+    if (!text) return;
+    setInput('');
+    sendMessage(text);
+  };
 
   // Auto-scroll to bottom on new message
   useEffect(() => {
@@ -87,13 +149,6 @@ const ChatWidget = () => {
   useEffect(() => {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 300);
   }, [isOpen]);
-
-  const handleSend = () => {
-    const text = input.trim();
-    if (!text) return;
-    setInput('');
-    sendMessage(text);
-  };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
