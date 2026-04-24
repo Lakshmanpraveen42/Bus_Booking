@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app.db.session import get_db
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.chat_service import chat_service
 
 router = APIRouter()
 
 @router.post("/", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest):
-    result = chat_service.process_message(request.message)
+async def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
+    result = chat_service.process_message(request, db)
     return result
