@@ -2,8 +2,8 @@
   "greetings": ["hi", "hello", "hey", "good morning", "good evening", "hii"],
   "farewell": ["bye", "goodbye", "see you", "thanks", "thank you"],
   "responses": {
-    "greeting": "Hello! 👋 I'm your BusGo travel assistant. How can I help you today?\n\nYou can ask me about:\n• 🚌 Available buses\n• 💺 Seat types\n• 🎫 Booking process\n• 💰 Refund & cancellation",
-    "farewell": "Thank you for choosing BusGo! Have a safe journey. 🚌✨",
+    "greeting": "Hello! 👋 I'm your SmartBus travel assistant. How can I help you today?\n\nYou can ask me about:\n• 🚌 Available buses\n• 💺 Seat types\n• 🎫 Booking process\n• 💰 Refund & cancellation",
+    "farewell": "Thank you for choosing SmartBus! Have a safe journey. 🚌✨",
     "cancellation": "**Cancellation Policy:**\n\n• Cancel 24+ hours before departure → 90% refund\n• Cancel 12–24 hours before → 50% refund\n• Cancel within 12 hours → No refund\n\nTo cancel, go to **My Bookings** and select your trip.",
     "refund": "Refunds are processed within **5–7 business days** to your original payment method.\n\nFor UPI payments, refunds may arrive within **24–48 hours**.",
     "seats": "We offer three seat types:\n\n• **AC Seater (2+2)** – Budget-friendly with AC ❄️\n• **AC Sleeper (2+1)** – Fully flat berths for long journeys 🛏️\n• **Non-AC Seater** – Most affordable option 💸",

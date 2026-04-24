@@ -46,7 +46,7 @@ const AboutUs = () => {
           </div>
           <h1 className="text-5xl md:text-8xl font-black text-white mb-8 tracking-tighter">Revolutionizing <br/> <span className="text-primary-500 italic">Road Travel.</span></h1>
           <p className="text-slate-400 text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed">
-            BusGo is India's most premium online bus ticketing platform, dedicated to making every journey a seamless and delightful experience.
+            SmartBus is India's most premium online bus ticketing platform, dedicated to making every journey a seamless and delightful experience.
           </p>
         </div>
       </div>
@@ -67,7 +67,7 @@ const AboutUs = () => {
            <div>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-8 leading-tight">Driven by a simple <br/>mission: <span className="text-primary-500">Speed.</span></h2>
               <p className="text-slate-600 text-lg leading-relaxed mb-6">
-                Founded in 2020, BusGo was born out of a desire to simplify the chaotic world of bus travel in India. We saw the need for a platform that wasn't just about tickets, but about the trust and comfort of the passenger.
+                Founded in 2020, SmartBus was born out of a desire to simplify the chaotic world of bus travel in India. We saw the need for a platform that wasn't just about tickets, but about the trust and comfort of the passenger.
               </p>
               <p className="text-slate-600 text-lg leading-relaxed">
                 Today, we operate across 100,000+ routes, partnering with the finest bus operators to ensure that whether you're traveling for work or leisure, you arrive happy.
@@ -89,7 +89,7 @@ const AboutUs = () => {
         {/* Values */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-black text-slate-900 mb-4">The Values We Live By</h2>
-          <p className="text-slate-500 text-lg">Integrity, Innovation, and Interconnectivity are the pillars of BusGo.</p>
+          <p className="text-slate-500 text-lg">Integrity, Innovation, and Interconnectivity are the pillars of SmartBus.</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

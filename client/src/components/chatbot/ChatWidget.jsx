@@ -118,7 +118,7 @@ const ChatWidget = () => {
                 <Bot className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-white font-semibold text-sm">BusGo Assistant</p>
+                <p className="text-white font-semibold text-sm">SmartBus Assistant</p>
                 <p className="text-white/70 text-[11px] flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
                   Online

@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Globe, ShieldCheck } from 'lucide-react';
 import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/ui/Button';
+import api from '../services/api';
+import toast from 'react-hot-toast';
 
 const InfoCard = ({ icon: Icon, title, content, subContent }) => (
   <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all group">
@@ -20,11 +22,14 @@ const Contact = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm();
 
   const onSubmit = async (data) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log('Form data:', data);
-    setSubmitted(true);
-    reset();
+    try {
+      await api.post('/support/contact', data);
+      setSubmitted(true);
+      reset();
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      toast.error('Failed to send message. Please try again!');
+    }
   };
 
   return (
@@ -46,7 +51,7 @@ const Contact = () => {
               We're Here to <span className="text-primary-500">Help</span> You Journey Better.
             </h1>
             <p className="text-xl text-slate-400 font-medium leading-relaxed">
-              Have questions about your booking, safety, or partnership opportunities? 
+              Have questions about your booking, safety, or partnership opportunities?
               Our team is available 24/7 to assist you.
             </p>
           </div>
@@ -58,25 +63,25 @@ const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Details Side */}
           <div className="lg:col-span-1 space-y-6 animate-fade-in-up [animation-delay:100ms]">
-            <InfoCard 
+            <InfoCard
               icon={Phone}
               title="Give us a call"
               content="+91 800 123 4567"
               subContent="24/7 dedicated support line"
             />
-            <InfoCard 
+            <InfoCard
               icon={Mail}
               title="Email support"
-              content="support@busgo.com"
+              content="support@smartbus.com"
               subContent="We usually respond within 2 hours"
             />
-            <InfoCard 
+            <InfoCard
               icon={MapPin}
               title="Headquarters"
               content="Indiranagar, Bangalore"
               subContent="Karnataka, India - 560038"
             />
-            
+
             <div className="bg-gradient-to-br from-primary-500 to-accent-600 rounded-3xl p-8 text-white shadow-xl shadow-primary-500/20">
               <div className="flex items-center gap-3 mb-4">
                 <ShieldCheck className="w-8 h-8" />
@@ -103,8 +108,8 @@ const Contact = () => {
                   <p className="text-slate-500 max-w-sm mx-auto mb-8">
                     Thanks for reaching out! Our team will review your message and get back to you shortly.
                   </p>
-                  <Button 
-                    variant="secondary" 
+                  <Button
+                    variant="secondary"
                     onClick={() => setSubmitted(false)}
                   >
                     Send Another Message
@@ -121,7 +126,7 @@ const Contact = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-700 ml-1">Your Name</label>
-                        <input 
+                        <input
                           {...register('name', { required: 'Name is required' })}
                           placeholder="John Doe"
                           className={`w-full px-5 py-4 bg-slate-50 border ${errors.name ? 'border-red-300' : 'border-slate-100'} rounded-2xl focus:outline-none focus:border-primary-500 focus:bg-white transition-all`}
@@ -130,8 +135,8 @@ const Contact = () => {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-700 ml-1">Email Address</label>
-                        <input 
-                          {...register('email', { 
+                        <input
+                          {...register('email', {
                             required: 'Email is required',
                             pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' }
                           })}
@@ -144,7 +149,7 @@ const Contact = () => {
 
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Subject</label>
-                      <select 
+                      <select
                         {...register('subject', { required: 'Subject is required' })}
                         className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-primary-500 focus:bg-white transition-all appearance-none"
                       >
@@ -159,7 +164,7 @@ const Contact = () => {
 
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Message</label>
-                      <textarea 
+                      <textarea
                         {...register('message', { required: 'Message is required' })}
                         rows={5}
                         placeholder="Tell us how we can help..."
@@ -168,10 +173,10 @@ const Contact = () => {
                       {errors.message && <p className="text-xs text-red-500 ml-1">{errors.message.message}</p>}
                     </div>
 
-                    <Button 
-                      type="submit" 
-                      fullWidth 
-                      size="xl" 
+                    <Button
+                      type="submit"
+                      fullWidth
+                      size="xl"
                       loading={isSubmitting}
                       leftIcon={!isSubmitting && <Send className="w-5 h-5" />}
                     >

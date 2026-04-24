@@ -1,30 +1,36 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+
   theme: {
     extend: {
       colors: {
         primary: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444', // Vibrant Red
-          600: '#dc2626',
+          50: 'var(--primary-50, #fef2f2)',
+          100: 'var(--primary-100, #fee2e2)',
+          200: 'var(--primary-200, #fecaca)',
+          300: 'var(--primary-300, #fca5a5)',
+          400: 'var(--primary-400, #f87171)',
+          500: 'var(--primary)', // Map 500 to our variable
+          600: 'var(--primary-hover)',
           700: '#b91c1c',
           800: '#991b1b',
           900: '#7f1d1d',
           950: '#450a0a',
         },
         accent: {
-          500: '#f97316', // Orange
+          500: 'var(--accent)',
           600: '#ea580c',
         },
-        surface: '#FFFFFF',
-        background: '#fcfcfd',
-        border: '#f1f5f9',
-        dark: '#0f172a',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: 'var(--card)',
+        'card-border': 'var(--card-border)',
+        surface: 'var(--surface)',
+        muted: 'var(--muted)',
+        'muted-light': 'var(--muted-light)',
+        'input-bg': 'var(--input-bg)',
+        border: 'var(--input-border)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

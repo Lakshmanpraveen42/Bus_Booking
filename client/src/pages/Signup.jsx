@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/layout/PageWrapper';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { User, Mail, Lock, Phone, UserPlus, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Phone, UserPlus, ShieldCheck, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
 const Signup = () => {
@@ -19,6 +19,8 @@ const Signup = () => {
     password: ''
   });
   const [otpCode, setOtpCode] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -55,7 +57,7 @@ const Signup = () => {
                    <UserPlus className="w-8 h-8" />
                 </div>
                 <h1 className="text-3xl font-black text-slate-900 mb-2">Create Account</h1>
-                <p className="text-slate-500">Join BusGo and enjoy seamless travel.</p>
+                <p className="text-slate-500">Join SmartBus and enjoy seamless travel.</p>
               </div>
 
               {error && (
@@ -98,11 +100,20 @@ const Signup = () => {
                 <Input 
                   label="Password" 
                   name="password"
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
                   leftIcon={<Lock className="w-4 h-4" />}
+                  rightIcon={
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="hover:text-primary-500 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  }
                   required
                 />
 

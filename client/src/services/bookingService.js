@@ -8,7 +8,10 @@ export const bookingService = {
       const response = await api.post('/bookings/', {
         trip_id: payload.tripId,
         seat_numbers: payload.selectedSeats.join(','),
-        total_amount: payload.pricing.total
+        total_amount: payload.pricing.total,
+        passengers: payload.passengers,
+        boarding_point: payload.boardingPoint,
+        dropping_point: payload.droppingPoint
       });
       
       return response.data;
@@ -23,6 +26,15 @@ export const bookingService = {
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.detail || 'Failed to load bookings');
+    }
+  },
+
+  async cancelBooking(bookingId) {
+    try {
+      const response = await api.post(`/bookings/${bookingId}/cancel`);
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.detail || 'Cancellation failed');
     }
   }
 };

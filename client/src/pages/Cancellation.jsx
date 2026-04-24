@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PageWrapper from '../components/layout/PageWrapper';
 import { XCircle, RefreshCw, Clock, History, AlertTriangle, FileText, CheckCircle } from 'lucide-react';
 
@@ -99,9 +100,12 @@ const Cancellation = () => {
               </div>
 
               <div className="mt-12 pt-10 border-t border-white/5">
-                 <button className="w-full bg-white text-slate-900 py-4 rounded-2xl font-black hover:bg-primary-500 hover:text-white transition-all shadow-xl hover:-translate-y-1">
+                 <Link 
+                   to="/my-bookings"
+                   className="w-full bg-white text-slate-900 py-4 rounded-2xl font-black hover:bg-primary-500 hover:text-white transition-all shadow-xl hover:-translate-y-1 block text-center"
+                 >
                     Manage My Bookings
-                 </button>
+                 </Link>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 from typing import Optional
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "BusGo Backend"
+    PROJECT_NAME: str = "SmartBus Backend"
     API_V1_STR: str = "/api/v1"
     
     # Security
@@ -19,10 +19,13 @@ class Settings(BaseSettings):
     MAIL_FROM: str = ""
     MAIL_PORT: int = 587
     MAIL_SERVER: str = "smtp.gmail.com"
-    MAIL_FROM_NAME: str = "BusGo Support"
+    MAIL_FROM_NAME: str = "SmartBus Support"
     MAIL_STARTTLS: bool = True
     MAIL_SSL_TLS: bool = False
     USE_CREDENTIALS: bool = True
+    
+    # AI / Chatbot
+    GROQ_API_KEY: Optional[str] = None
     
     class Config:
         env_file = ".env"

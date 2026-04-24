@@ -1,26 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MapPin, Calendar, ArrowLeftRight, Search, ChevronRight, ShieldCheck, Zap, Headphones, CreditCard, Bus } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/ui/Button';
 import { useBookingStore } from '../store/useBookingStore';
 import { POPULAR_ROUTES } from '../utils/constants';
-import cities from '../data/cities.json';
+import { tripService } from '../services/tripService';
+import staticCities from '../data/cities.json';
 
 const MIN_DATE = format(new Date(), 'yyyy-MM-dd');
 const DEFAULT_DATE = format(addDays(new Date(), 1), 'yyyy-MM-dd');
 
 /** City autocomplete input */
-const CityInput = ({ id, label, value, onChange, placeholder, icon: Icon }) => {
+const CityInput = ({ id, label, value, onChange, placeholder, icon: Icon, cities }) => {
   const [open, setOpen] = useState(false);
   const filtered = value.length > 0
-    ? cities.filter((c) => c.toLowerCase().startsWith(value.toLowerCase()) && c !== value).slice(0, 6)
+    ? cities.filter((c) => c.toLowerCase().includes(value.toLowerCase()) && c.toLowerCase() !== value.toLowerCase()).slice(0, 6)
     : [];
 
   return (
-    <div className="relative flex-1 min-w-0">
-      <label htmlFor={id} className="block text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] mb-2 ml-1">
+    <div className="relative flex-1 min-w-0" style={{ zIndex: 9999 }}>
+      <label htmlFor={id} className="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">
         {label}
       </label>
       <div className="relative group">
@@ -39,18 +41,25 @@ const CityInput = ({ id, label, value, onChange, placeholder, icon: Icon }) => {
         />
       </div>
       {open && filtered.length > 0 && (
-        <ul className="absolute z-30 top-full mt-2 left-0 right-0 bg-white rounded-2xl shadow-modal border border-slate-100 overflow-hidden animate-fade-in py-1">
+        <ul 
+          className="absolute top-full mt-2 left-0 right-0 rounded-2xl border border-slate-200 overflow-hidden animate-fade-in py-1 shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
+          style={{ backgroundColor: 'white', opacity: 1, zIndex: 99999 }}
+        >
           {filtered.map((city) => (
-            <li key={city}>
+            <li key={city} style={{ backgroundColor: 'white' }}>
               <button
                 type="button"
                 onMouseDown={() => { onChange(city); setOpen(false); }}
-                className="w-full text-left px-5 py-3 text-sm font-bold text-slate-700 hover:bg-primary-50 hover:text-primary-600 flex items-center gap-3 transition-colors"
+                className="w-full text-left px-5 py-4 text-sm font-bold text-slate-900 hover:bg-slate-50 hover:text-primary-600 flex items-center gap-4 transition-all group"
+                style={{ backgroundColor: 'white' }}
               >
-                <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
-                  <MapPin className="w-4 h-4" />
+                <div className="w-10 h-10 rounded-xl bg-slate-50 group-hover:bg-primary-50 flex items-center justify-center text-slate-400 group-hover:text-primary-500 transition-colors">
+                  <MapPin className="w-5 h-5 transition-transform group-hover:scale-110" />
                 </div>
-                {city}
+                <div className="flex flex-col">
+                  <span className="text-base font-bold uppercase tracking-tight">{city}</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Available Station</span>
+                </div>
               </button>
             </li>
           ))}
@@ -61,12 +70,27 @@ const CityInput = ({ id, label, value, onChange, placeholder, icon: Icon }) => {
 };
 
 const Home = () => {
+  const { t } = useTranslation();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [date, setDate] = useState(DEFAULT_DATE);
   const [error, setError] = useState('');
+  const [dynamicCities, setDynamicCities] = useState(staticCities);
   const navigate = useNavigate();
   const setSearchParams = useBookingStore((s) => s.setSearchParams);
+
+  // Fetch unique locations on mount
+  useEffect(() => {
+    const loadLocations = async () => {
+      const liveLocations = await tripService.getLocations();
+      if (liveLocations && liveLocations.length > 0) {
+        // Merge with static list and remove duplicates
+        const merged = Array.from(new Set([...staticCities, ...liveLocations]));
+        setDynamicCities(merged);
+      }
+    };
+    loadLocations();
+  }, []);
 
   const handleSwap = () => { setFrom(to); setTo(from); };
 
@@ -94,34 +118,41 @@ const Home = () => {
           <div className="absolute bottom-1/4 -left-20 w-[400px] h-[400px] bg-accent-500/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
 
-        <div className="relative z-10 w-full max-w-5xl mx-auto text-center px-4 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in shadow-xl backdrop-blur-sm">
+        <div className="relative z-10 w-full max-w-5xl mx-auto text-center px-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 text-xs font-bold uppercase tracking-widest mb-8 shadow-xl backdrop-blur-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
-            India's Most Trusted Travel App
+            {t('hero.badge')}
           </div>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-[1.1] tracking-tight px-2">
-            Seamless Bookings.<br className="hidden sm:block" />
-            <span className="text-gradient">Premium Travel.</span>
+            {t('hero.title').split('.')[0]}.<br className="hidden sm:block" />
+            <span className="text-gradient">{t('hero.title').split('.')[1]}</span>
           </h1>
           
-          <p className="text-slate-400 text-lg md:text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
-            Join 5M+ travelers booking tickets across 10,000+ routes daily. 
-            Enjoy instant confirmation and best-in-class support.
+          <p className="text-slate-300 text-lg md:text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+            {t('hero.subtitle')}
           </p>
 
           {/* Search Card */}
-          <div className="relative max-w-5xl mx-auto mt-10 md:mt-16 w-full animate-fade-in-up [animation-delay:200ms]">
+          <div className="relative z-[100] max-w-5xl mx-auto mt-10 md:mt-16 w-full">
             <div className="absolute -inset-2 bg-gradient-to-r from-primary-600/20 to-accent-600/20 rounded-[2.5rem] blur-xl opacity-50" />
             
             <form 
               onSubmit={handleSearch} 
-              className="relative bg-white/95 backdrop-blur-2xl rounded-[2.2rem] p-5 md:p-8 shadow-modal border border-white/40"
+              className="relative z-[200] bg-[#0f172a] rounded-[2.2rem] p-5 md:p-8 shadow-2xl border border-white/10"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5 items-end">
                 {/* From Field */}
                 <div className="lg:col-span-3">
-                  <CityInput id="from" label="From" value={from} onChange={setFrom} placeholder="e.g. Mumbai" icon={MapPin} />
+                  <CityInput 
+                    id="from" 
+                    label={t('common.from')} 
+                    value={from} 
+                    onChange={setFrom} 
+                    placeholder={t('search.placeholderFrom')} 
+                    icon={MapPin} 
+                    cities={dynamicCities}
+                  />
                 </div>
 
                 {/* Swap Button - Desktop: Absolute Center / Mobile: Inline */}
@@ -138,7 +169,15 @@ const Home = () => {
 
                 {/* To Field */}
                 <div className="lg:col-span-3">
-                  <CityInput id="to" label="To" value={to} onChange={setTo} placeholder="e.g. Pune" icon={MapPin} />
+                  <CityInput 
+                    id="to" 
+                    label={t('common.to')} 
+                    value={to} 
+                    onChange={setTo} 
+                    placeholder={t('search.placeholderTo')} 
+                    icon={MapPin} 
+                    cities={dynamicCities}
+                  />
                 </div>
 
                 {/* Date Picker */}
@@ -153,7 +192,7 @@ const Home = () => {
                       value={date}
                       min={MIN_DATE}
                       onChange={(e) => setDate(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 rounded-2xl text-slate-900 text-sm md:text-base font-bold bg-slate-50 border-2 border-transparent focus:border-primary-500 focus:bg-white focus:outline-none transition-all shadow-sm"
+                      className="w-full pl-12 pr-4 py-4 rounded-2xl text-foreground text-sm md:text-base font-bold bg-surface border-2 border-transparent focus:border-primary focus:bg-card focus:outline-none transition-all shadow-sm"
                     />
                   </div>
                 </div>
@@ -165,7 +204,7 @@ const Home = () => {
                     className="w-full h-[60px] bg-primary-500 hover:bg-primary-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
                   >
                     <Search className="w-5 h-5" />
-                    <span>Search</span>
+                    <span>{t('search.button')}</span>
                   </button>
                 </div>
               </div>
@@ -180,7 +219,7 @@ const Home = () => {
           </div>
 
           {/* Popular Routes */}
-          <div className="mt-16 md:mt-24 w-full">
+          <div className="mt-16 md:mt-24 w-full relative z-[1]">
             <p className="text-slate-500 text-[10px] uppercase tracking-[0.4em] font-black mb-8">
               Popular Destinations in India
             </p>
@@ -189,7 +228,7 @@ const Home = () => {
                 <button
                   key={`${route.from}-${route.to}`}
                   onClick={() => handlePopularRoute(route)}
-                  className="group flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl md:rounded-2xl text-white transition-all hover:translate-y-[-4px] backdrop-blur-sm"
+                  className="group flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 bg-slate-800/50 hover:bg-primary-600/20 border border-white/10 rounded-xl md:rounded-2xl text-white transition-all hover:translate-y-[-4px]"
                 >
                   <span className="text-slate-400 group-hover:text-primary-400 transition-colors font-bold text-xs md:text-sm">{route.from}</span>
                   <ChevronRight className="w-3 md:w-3.5 h-3 md:h-3.5 text-white/20" />
@@ -207,8 +246,8 @@ const Home = () => {
           <div className="inline-block px-4 py-1.5 rounded-full bg-primary-50 text-primary-600 text-[10px] font-black uppercase tracking-widest mb-6">
             Our Standards
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">The BusGo Experience</h2>
-          <p className="text-slate-500 font-medium max-w-xl mx-auto text-base md:text-lg leading-relaxed">
+          <h2 className="text-3xl md:text-5xl font-black text-foreground mb-6 tracking-tight">The SmartBus Experience</h2>
+          <p className="text-muted font-medium max-w-xl mx-auto text-base md:text-lg leading-relaxed">
             Why millions of travelers prefer us for their inter-city journeys 
             across India's most complex routes.
           </p>
@@ -221,12 +260,12 @@ const Home = () => {
             { icon: <Headphones />, title: '24/7 Support', desc: 'Need help? Our dedicated travel experts are available around the clock.', color: 'text-primary-500', bg: 'bg-primary-50' },
             { icon: <CreditCard />, title: 'Easy Refunds', desc: 'Simplified cancellation policy with instant refunds processed to your source.', color: 'text-indigo-500', bg: 'bg-indigo-50' },
           ].map((f) => (
-            <div key={f.title} className="group p-8 md:p-10 bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-slate-100 transition-all duration-500 hover:shadow-modal hover:translate-y-[-12px]">
+            <div key={f.title} className="group p-8 md:p-10 bg-card rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-card-border transition-all duration-500 hover:shadow-modal hover:translate-y-[-12px]">
               <div className={[`w-14 md:w-16 h-14 md:h-16 rounded-2xl ${f.bg} ${f.color} flex items-center justify-center mb-6 md:mb-8 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`].join(' ')}>
                 {React.cloneElement(f.icon, { className: 'w-7 md:w-8 h-7 md:h-8' })}
               </div>
-              <h3 className="text-xl md:text-2xl font-black text-slate-900 mb-3 md:mb-4 tracking-tight">{f.title}</h3>
-              <p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed">{f.desc}</p>
+              <h3 className="text-xl md:text-2xl font-black text-foreground mb-3 md:mb-4 tracking-tight">{f.title}</h3>
+              <p className="text-muted text-sm md:text-base font-medium leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>

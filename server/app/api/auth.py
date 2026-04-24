@@ -4,11 +4,28 @@ from datetime import datetime, timedelta
 import random
 from app.db.session import get_db
 from app.models.models import User, OTP
-from app.schemas.schemas import UserCreate, UserResponse, Token, OTPVerify
+from app.schemas.schemas import UserCreate, UserResponse, Token, OTPVerify, PasswordChange
 from app.core.security import get_password_hash, verify_password, create_access_token
 from app.services.email_service import send_otp_email, send_welcome_email
+from app.api.dependencies import get_current_user
 
 router = APIRouter()
+
+@router.post("/change-password", response_model=dict)
+async def change_password(
+    data: PasswordChange, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Verify old password
+    if not verify_password(data.old_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect old password")
+    
+    # Update password
+    current_user.hashed_password = get_password_hash(data.new_password)
+    db.commit()
+    
+    return {"message": "Password updated successfully"}
 
 @router.post("/register", response_model=dict)
 async def register(user_in: UserCreate, db: Session = Depends(get_db)):
@@ -73,6 +90,7 @@ async def verify_otp(data: OTPVerify, db: Session = Depends(get_db)):
             "id": user.id,
             "name": user.name,
             "email": user.email,
+            "phone": user.phone,
             "is_admin": user.is_admin
         }
     }
@@ -84,8 +102,17 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
     username = form_data.username
     password = form_data.password
     user = db.query(User).filter(User.email == username).first()
-    if not user or not verify_password(password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Account not found. Please sign up to continue."
+        )
+    
+    if not verify_password(password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Incorrect password. Please try again."
+        )
     
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -98,6 +125,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
             "id": user.id,
             "name": user.name,
             "email": user.email,
+            "phone": user.phone,
             "is_admin": user.is_admin
         }
     }

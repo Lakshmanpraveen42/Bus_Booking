@@ -11,6 +11,10 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
+class PasswordChange(BaseModel):
+    old_password: str
+    new_password: str
+
 class UserResponse(UserBase):
     id: int
     is_admin: bool
@@ -56,8 +60,20 @@ class TripBase(BaseModel):
     price: float
     bus_id: int
 
+class TripStopCreate(BaseModel):
+    location: str
+    arrival_time: Optional[datetime] = None
+    order: int
+
 class TripCreate(TripBase):
-    pass
+    stops: Optional[List[TripStopCreate]] = []
+
+class TripStopResponse(BaseModel):
+    location: str
+    arrival_time: Optional[datetime] = None
+    order: int
+    class Config:
+        from_attributes = True
 
 class TripResponse(BaseModel):
     id: int
@@ -68,6 +84,7 @@ class TripResponse(BaseModel):
     price: float
     bus_id: int
     bus: Optional[BusResponse] = None
+    stops: List[TripStopResponse] = []
     class Config:
         from_attributes = True
 
@@ -83,11 +100,21 @@ class TripSeatLayout(BaseModel):
     booked_seats: List[str]
     price: float
 
+class PassengerSchema(BaseModel):
+    name: str
+    age: int
+    gender: str
+    seatId: str
+
+
 # --- Booking Schemas ---
 class BookingCreate(BaseModel):
     trip_id: int
     seat_numbers: str
     total_amount: float
+    passengers: List[PassengerSchema]
+    boarding_point: Optional[str] = None
+    dropping_point: Optional[str] = None
 
 class BookingResponse(BaseModel):
     id: int
@@ -96,7 +123,13 @@ class BookingResponse(BaseModel):
     total_amount: float
     status: str
     payment_status: str
+    qr_code_path: Optional[str] = None
     booking_time: datetime
+    cancellation_time: Optional[datetime] = None
+    passenger_details: Optional[str] = None
+    boarding_point: Optional[str] = None
+    dropping_point: Optional[str] = None
     trip: Optional[TripResponse] = None
+
     class Config:
         from_attributes = True

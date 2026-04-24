@@ -36,7 +36,7 @@ const TermsOfUse = () => {
       <div className="bg-slate-950 py-24 relative overflow-hidden text-center">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl -ml-48 -mb-48"></div>
-        
+
         <div className="max-w-4xl mx-auto px-4 relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 rounded-full text-blue-400 text-sm font-bold tracking-wider uppercase mb-6">
             <Scale className="w-4 h-4" />
@@ -44,7 +44,7 @@ const TermsOfUse = () => {
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white mb-6">Terms of Use</h1>
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Please read these terms carefully before using our platform. They govern your use of BusGo and your rights as a passenger.
+            Welcome to SmartBus. By using our services, you agree to the following terms and conditions designed to ensure a safe and reliable experience for everyone.
           </p>
           <div className="mt-8 text-sm text-slate-500 font-medium italic">
             Last Updated: April 22, 2026
@@ -81,7 +81,7 @@ const TermsOfUse = () => {
             <div>
               <h4 className="text-lg font-bold text-slate-900 mb-2">Need clarification?</h4>
               <p className="text-slate-600">
-                If you have any questions regarding these terms, our legal team is here to help. Reach out to us via the contact form or email us directly at legal@busgo.com.
+                If you have any questions regarding these terms, our legal team is here to help. Reach out to us via the contact form or email us directly at legal@smartbus.com.
               </p>
             </div>
           </div>

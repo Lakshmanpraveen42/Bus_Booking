@@ -47,9 +47,9 @@ const SafetyGuide = () => {
             <Shield className="w-4 h-4" />
             Safety First Initiative
           </div>
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 leading-tight">Your safety is our <span className="text-rose-500 underline decoration-rose-500/30 underline-offset-8 italic">commitment.</span></h1>
-          <p className="text-slate-400 text-xl max-w-2xl leading-relaxed">
-            At BusGo, we believe every journey should be as safe as it is comfortable. Discover the multiple layers of protection we provide for every passenger.
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6">Safety Guide</h1>
+          <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            Your safety is our top commitment. Discover how SmartBus ensures a secure and protected travel experience for every passenger.
           </p>
         </div>
       </div>

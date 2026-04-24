@@ -3,11 +3,12 @@ import json
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response, StreamingResponse
+from starlette.concurrency import iterate_in_threadpool
 import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("busgo_api")
+logger = logging.getLogger("smartbus_api")
 
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -37,9 +38,13 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         status_code = response.status_code
 
         # Capture Response Body (safely)
-        response_body = getattr(response, 'body', b"")
-        if isinstance(response, StreamingResponse):
-             # We skip logging streaming bodies to ensure stability
+        response_body = b""
+        if not isinstance(response, StreamingResponse):
+             # Consuming body iterator to log it, then replacing it so it can still be sent
+             res_body = [chunk async for chunk in response.body_iterator]
+             response.body_iterator = iterate_in_threadpool(iter(res_body))
+             response_body = b"".join(res_body)
+        else:
              response_body = b"[Streaming Content]"
 
         # Format and Print Logs
@@ -49,7 +54,6 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         if request_body:
             try:
                 body_json = json.loads(request_body)
-                # Sensitive info masking (simple)
                 if "password" in body_json: body_json["password"] = "********"
                 log_msg += f"📦 Payload: {json.dumps(body_json, indent=2)}\n"
             except:
@@ -59,11 +63,11 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         
         if response_body and response_body != b"[Streaming Content]":
             try:
-                # Only log short JSON responses to keep logs clean
                 res_json = json.loads(response_body)
-                log_msg += f"📥 Result: {json.dumps(res_json, indent=2)[:500]}{'...' if len(response_body) > 500 else ''}\n"
+                # Pretty print the result (especially important for chatbot replies)
+                log_msg += f"📥 Result: {json.dumps(res_json, indent=2)}\n"
             except:
-                pass
+                log_msg += f"📥 Result: {response_body.decode('utf-8', errors='ignore')[:500]}...\n"
         
         log_msg += f"{'='*50}\n"
         logger.info(log_msg)

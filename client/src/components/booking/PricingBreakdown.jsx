@@ -38,6 +38,13 @@ const PricingBreakdown = ({ pricing, seatCount }) => (
         }
         value={formatPrice(pricing.gst)}
       />
+      {pricing.insurance > 0 && (
+        <Line
+          label={`Travel Insurance (${seatCount} × ₹15)`}
+          value={formatPrice(pricing.insurance)}
+          highlight
+        />
+      )}
     </div>
 
     <div className="border-t border-slate-200 mt-3 pt-3">

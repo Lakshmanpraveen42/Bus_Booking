@@ -24,7 +24,7 @@ const generateLayout = (totalSeats, category, bookedSeats) => {
         col: c + 1,
         side: c < (seatsPerRow / 2) ? 'left' : 'right',
         deck: 'lower',
-        status: bookedSeats.includes(seatId) ? SEAT_STATUS.OCCUPIED : SEAT_STATUS.AVAILABLE
+        status: bookedSeats.includes(seatId) ? SEAT_STATUS.BOOKED : SEAT_STATUS.AVAILABLE
       });
       seatIndex++;
     }
@@ -42,13 +42,14 @@ export const seatService = {
   async getSeatLayout(tripId) {
     try {
       const response = await api.get(`/trips/${tripId}/seats`);
-      const { total_seats, category, booked_seats, trip_id } = response.data;
+      const { total_seats, category, booked_seats, trip_id, stops } = response.data;
       
       const dynamicLayout = generateLayout(total_seats, category, booked_seats);
       
       return {
         tripId: trip_id,
-        ...dynamicLayout
+        ...dynamicLayout,
+        stops: stops || []
       };
     } catch (err) {
       throw new Error(err.response?.data?.detail || 'Failed to load seat layout');

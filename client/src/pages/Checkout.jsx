@@ -6,6 +6,7 @@ import PageWrapper from '../components/layout/PageWrapper';
 import BookingSummary from '../components/booking/BookingSummary';
 import PricingBreakdown from '../components/booking/PricingBreakdown';
 import PassengerFormRow from '../components/booking/PassengerFormRow';
+import BookingSteps from '../components/booking/BookingSteps';
 import Button from '../components/ui/Button';
 import { useBookingStore } from '../store/useBookingStore';
 import { useBooking } from '../hooks/useBooking';
@@ -17,6 +18,8 @@ const Checkout = () => {
   const selectedSeats = useBookingStore((s) => s.selectedSeats);
   const pricing = useBookingStore((s) => s.pricing);
   const setPassengers = useBookingStore((s) => s.setPassengers);
+  const insuranceSelected = useBookingStore((s) => s.insuranceSelected);
+  const toggleInsurance = useBookingStore((s) => s.toggleInsurance);
   const { submit, retry, isProcessing, isSuccess, isFailed, error } = useBooking();
 
   const methods = useForm({
@@ -50,19 +53,7 @@ const Checkout = () => {
         </div>
 
         {/* Step indicator */}
-        <div className="flex items-center gap-2 mb-8">
-          {['Search', 'Select Bus', 'Select Seats', 'Checkout', 'Confirmation'].map((step, i) => (
-            <React.Fragment key={step}>
-              <div className={[
-                'px-3 py-1 rounded-full text-xs font-semibold',
-                i === 3 ? 'bg-primary-500 text-white' : i < 3 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400',
-              ].join(' ')}>
-                {i < 3 ? '✓ ' : ''}{step}
-              </div>
-              {i < 4 && <div className="h-px flex-1 bg-slate-200" />}
-            </React.Fragment>
-          ))}
-        </div>
+        <BookingSteps currentStep={3} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Passenger Details Form */}
@@ -82,6 +73,40 @@ const Checkout = () => {
                   </div>
                 </form>
               </FormProvider>
+            </div>
+
+            {/* Insurance Option */}
+            <div className="bg-white rounded-2xl shadow-card border border-slate-100 p-5 mb-5 hover:border-primary-500/20 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600">
+                    <ShieldCheck className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-800">Travel Insurance</h3>
+                    <p className="text-sm text-slate-500">Secure your trip with comprehensive coverage for just ₹15 / person</p>
+                    <button 
+                      type="button"
+                      onClick={() => navigate('/insurance')}
+                      className="text-xs text-primary-600 font-bold hover:underline mt-1"
+                    >
+                      View Policy Details
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                   <span className="text-sm font-bold text-slate-800">₹{selectedSeats.length * 15}</span>
+                   <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer"
+                      checked={insuranceSelected}
+                      onChange={(e) => toggleInsurance(e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                  </label>
+                </div>
+              </div>
             </div>
 
             {/* Error Banner */}

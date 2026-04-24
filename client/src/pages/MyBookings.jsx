@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/layout/PageWrapper';
 import Badge from '../components/ui/Badge';
 import { Ticket, Calendar, Clock, MapPin, ChevronRight, Download, XCircle, Bus, Loader2 } from 'lucide-react';
 import { bookingService } from '../services/bookingService';
 import { formatPrice, formatDate, formatTime12h } from '../utils/formatters';
+import { differenceInHours } from 'date-fns';
+import { useAuthStore } from '../store/useAuthStore';
+import { LogIn } from 'lucide-react';
 
 const MyBookings = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   const [activeTab, setActiveTab] = useState('upcoming');
   const [bookings, setBookings] = useState({ upcoming: [], past: [] });
   const [loading, setLoading] = useState(true);
 
   const fetchBookings = async () => {
+    if (!isAuthenticated) return;
+    
     try {
       setLoading(true);
       const data = await bookingService.getMyBookings();
@@ -36,9 +44,23 @@ const MyBookings = () => {
     }
   };
 
+  const handleCancelClick = (bookingId) => {
+    navigate(`/cancel-booking/${bookingId}`);
+  };
+
+  const canCancel = (departureTime) => {
+    const dep = new Date(departureTime);
+    const now = new Date();
+    return differenceInHours(dep, now) >= 2;
+  };
+
   useEffect(() => {
-    fetchBookings();
-  }, []);
+    if (isAuthenticated) {
+      fetchBookings();
+    } else {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
 
   return (
     <PageWrapper className="pb-24 bg-slate-50 min-h-screen">
@@ -134,14 +156,45 @@ const MyBookings = () => {
                   </div>
                   <div className="flex gap-4">
                     {booking.status === 'booked' && (
-                      <button className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-slate-900/10">
-                        <Download className="w-4 h-4" /> Download Ticket
-                      </button>
+                      <div className="flex gap-4">
+                        <button className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-slate-900/10">
+                          <Download className="w-4 h-4" /> Ticket
+                        </button>
+                        
+                        {canCancel(booking.trip.departure_time) ? (
+                          <button 
+                            onClick={() => handleCancelClick(booking.id)}
+                            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white text-red-500 border border-red-100 font-bold text-sm hover:bg-red-50 transition-all hover:scale-105 active:scale-95"
+                          >
+                            <XCircle className="w-4 h-4" /> Cancel Trip
+                          </button>
+                        ) : (
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest max-w-[150px] leading-tight flex items-center pr-2">
+                            Cancellation closed <br/> (within 2h of trip)
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
             ))
+          ) : !isAuthenticated ? (
+            <div className="bg-white rounded-[40px] p-20 text-center shadow-xl shadow-slate-200/50 border border-slate-100">
+               <div className="w-24 h-24 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                  <LogIn className="w-12 h-12 text-primary-500" />
+               </div>
+               <h3 className="text-3xl font-black text-slate-900 mb-4">Login Required</h3>
+               <p className="text-slate-500 mb-10 max-w-md mx-auto text-lg leading-relaxed">
+                 Login and we will fetch your booking details. Manage your trips, download tickets, and more in one place.
+               </p>
+               <button 
+                 onClick={() => navigate('/login')}
+                 className="bg-primary-500 text-white px-12 py-5 rounded-2xl font-black text-lg shadow-xl shadow-primary-500/30 hover:scale-105 transition-all active:scale-95 flex items-center gap-3 mx-auto"
+               >
+                 <LogIn className="w-6 h-6" /> Login Now
+               </button>
+            </div>
           ) : (
             <div className="bg-white rounded-[40px] p-20 text-center shadow-xl shadow-slate-200/50 border border-slate-100">
               <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8">

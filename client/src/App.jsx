@@ -2,6 +2,7 @@ import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ChatWidget from './components/chatbot/ChatWidget';
 import ScrollToTop from './components/utils/ScrollToTop';
+import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/useAuthStore';
 import {
   RequireSearch,
@@ -32,10 +33,14 @@ import Careers from './pages/Careers';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MyBookings from './pages/MyBookings';
+import Profile from './pages/Profile';
+import CancellationPage from './pages/CancellationPage';
 import AdminDashboard from './pages/admin/Dashboard';
 import ManageBuses from './pages/admin/ManageBuses';
 import ManageRoutes from './pages/admin/ManageRoutes';
 import AllBookings from './pages/admin/AllBookings';
+import ManageUsers from './pages/admin/ManageUsers';
+import Settings from './pages/admin/Settings';
 import NotFound from './pages/NotFound';
 
 const App = () => {
@@ -52,6 +57,7 @@ const App = () => {
 
       {/* ChatWidget is rendered globally — visible on all pages */}
       <ChatWidget />
+      <Toaster position="top-center" reverseOrder={false} />
 
       <Routes>
         {/* Public */}
@@ -112,12 +118,16 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/cancel-booking/:bookingId" element={<CancellationPage />} />
+        <Route path="/profile" element={<Profile />} />
 
         {/* Admin */}
         <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
         <Route path="/admin/buses" element={<RequireAdmin><ManageBuses /></RequireAdmin>} />
         <Route path="/admin/routes" element={<RequireAdmin><ManageRoutes /></RequireAdmin>} />
         <Route path="/admin/bookings" element={<RequireAdmin><AllBookings /></RequireAdmin>} />
+        <Route path="/admin/users" element={<RequireAdmin><ManageUsers /></RequireAdmin>} />
+        <Route path="/admin/settings" element={<RequireAdmin><Settings /></RequireAdmin>} />
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />

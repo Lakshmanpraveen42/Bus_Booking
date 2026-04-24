@@ -11,6 +11,8 @@ import { useSeats } from '../hooks/useSeats';
 import { useBookingStore } from '../store/useBookingStore';
 import { formatPrice, formatTime12h } from '../utils/formatters';
 import { MAX_SEATS_PER_BOOKING } from '../utils/constants';
+import RoutePointsSelector from '../components/seat/RoutePointsSelector';
+import BookingSteps from '../components/booking/BookingSteps';
 
 const SeatSelection = () => {
   const { tripId } = useParams();
@@ -18,12 +20,14 @@ const SeatSelection = () => {
   const { data: layout, loading, error, refetch } = useSeats(tripId);
   const selectedBus = useBookingStore((s) => s.selectedBus);
   const selectedSeats = useBookingStore((s) => s.selectedSeats);
+  const boardingPoint = useBookingStore((s) => s.boardingPoint);
+  const droppingPoint = useBookingStore((s) => s.droppingPoint);
   const pricing = useBookingStore((s) => s.pricing);
 
   const [activeDeck, setActiveDeck] = useState('lower');
 
   const hasTwoDecks = layout?.decks?.length > 1;
-  const canContinue = selectedSeats.length > 0;
+  const canContinue = selectedSeats.length > 0 && boardingPoint && droppingPoint;
 
   return (
     <PageWrapper>
@@ -41,6 +45,9 @@ const SeatSelection = () => {
             Select Seats — {selectedBus?.operatorName}
           </h1>
         </div>
+
+        {/* Step indicator */}
+        <BookingSteps currentStep={2} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Seat Map */}
@@ -87,6 +94,10 @@ const SeatSelection = () => {
               <div className="mt-5 pt-4 border-t border-slate-100">
                 <SeatLegend />
               </div>
+
+              {!loading && !error && layout && (
+                  <RoutePointsSelector stops={layout.stops} />
+              )}
             </div>
           </div>
 
@@ -104,6 +115,24 @@ const SeatSelection = () => {
                     <span className="text-slate-400">→</span>
                     <span className="text-slate-700 font-medium">{formatTime12h(selectedBus.arrivalTime)}</span>
                   </div>
+                </div>
+              )}
+
+              {/* Route Points Summary */}
+              {(boardingPoint || droppingPoint) && (
+                <div className="mb-5 pb-4 border-b border-slate-100 space-y-2">
+                   {boardingPoint && (
+                     <div className="flex items-center gap-2">
+                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                       <span className="text-xs text-slate-500 font-medium">{boardingPoint} (Boarding)</span>
+                     </div>
+                   )}
+                   {droppingPoint && (
+                     <div className="flex items-center gap-2">
+                       <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                       <span className="text-xs text-slate-500 font-medium">{droppingPoint} (Dropping)</span>
+                     </div>
+                   )}
                 </div>
               )}
 

@@ -39,7 +39,7 @@ const BusPartners = () => {
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-white mb-8 leading-tight tracking-tight">Partner with <span className="text-emerald-400">India's Leading</span> Bus Network.</h1>
           <p className="text-slate-400 text-xl max-w-2xl leading-relaxed">
-            Join 2,500+ bus operators who have transformed their operations and increased their earnings with BusGo's industry-leading technology.
+            Join 2,500+ bus operators who have transformed their operations and increased their earnings with SmartBus's industry-leading technology.
           </p>
         </div>
       </div>

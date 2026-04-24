@@ -39,7 +39,8 @@ export const useChatStore = create((set, get) => ({
     }));
 
     try {
-      const { text: replyText, quickReplies } = await chatService.sendMessage(text);
+      const { messages } = get();
+      const { text: replyText, quickReplies } = await chatService.sendMessage(text, messages);
       const botMsg = makeMessage(replyText, CHAT_SENDER.BOT, quickReplies ?? []);
 
       set((state) => ({
@@ -59,6 +60,8 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  openChat: () => set({ isOpen: true, unreadCount: 0 }),
+  
   clearMessages: () =>
     set({ messages: [INITIAL_BOT_MSG], unreadCount: 0 }),
 }));

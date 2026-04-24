@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import PageWrapper from '../components/layout/PageWrapper';
 import { HelpCircle, ChevronDown, ChevronUp, Search, Info } from 'lucide-react';
+import { useChatStore } from '../store/useChatStore';
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(null);
+  const openChat = useChatStore((s) => s.openChat);
 
   const faqData = [
     {
       category: 'Booking Process',
       questions: [
-        { q: 'How do I book a bus ticket on BusGo?', a: 'To book a ticket, simply enter your source, destination, and travel date on the homepage. Browse the available buses, select your preferred seat, enter passenger details, and complete the payment.' },
+        { q: 'How do I book a bus ticket on SmartBus?', a: 'To book a ticket, simply enter your source, destination, and travel date on the homepage. Browse the available buses, select your preferred seat, enter passenger details, and complete the payment.' },
         { q: 'Can I book a ticket without registering an account?', a: 'Yes, you can book as a guest. However, we recommend creating an account to easily track your bookings, manage refunds, and receive exclusive offers.' },
         { q: 'Can I select a specific seat?', a: 'Absolutely! Our interactive seat map allows you to pick your preferred seat, whether it\'s a window seat, an aisle seat, or a lower/upper berth in sleeper buses.' }
       ]
@@ -46,7 +48,7 @@ const FAQ = () => {
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tight">Got questions? <br/>We have <span className="text-primary-500 underline decoration-primary-500/30 underline-offset-8 italic">answers.</span></h1>
           <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">
-            Everything you need to know about using BusGo, from booking your first ticket to managing refunds and insurance.
+            Everything you need to know about using SmartBus, from booking your first ticket to managing refunds and insurance.
           </p>
         </div>
       </div>
@@ -104,7 +106,10 @@ const FAQ = () => {
               <h3 className="text-2xl font-black text-slate-900 mb-2">Can't find what you're looking for?</h3>
               <p className="text-slate-600">Our dedicated support team is available 24/7 to answer your specific queries.</p>
            </div>
-           <button className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black hover:bg-primary-500 transition-all shadow-xl hover:-translate-y-1">
+           <button 
+             onClick={openChat}
+             className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black hover:bg-primary-500 transition-all shadow-xl hover:-translate-y-1 block text-center"
+           >
               Talk to Support
            </button>
         </div>

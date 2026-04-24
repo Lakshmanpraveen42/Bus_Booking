@@ -12,7 +12,7 @@ const Footer = () => (
             <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
               <Bus className="w-6 h-6 text-white" />
             </div>
-            <span className="text-white font-black text-2xl tracking-tight">BusGo</span>
+            <span className="text-white font-black text-2xl tracking-tight">SmartBus</span>
           </div>
           <p className="text-slate-400 text-lg leading-relaxed mb-8 max-w-md">
             India's most premium online bus ticketing platform. Experience comfort, reliability, and speed with every booking.
@@ -121,7 +121,7 @@ const Footer = () => (
           {[
             { icon: <MapPin />, label: 'India' },
             { icon: <Phone />, label: '+91 800 123 4567' },
-            { icon: <Mail />, label: 'support@busgo.com' },
+            { icon: <Mail />, label: 'support@smartbus.com' },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-2 px-4 py-2 bg-slate-900 rounded-full text-xs font-bold text-white whitespace-nowrap">
               {React.cloneElement(item.icon, { className: 'w-3 h-3 text-primary-500' })}
@@ -140,7 +140,7 @@ const Footer = () => (
       </div>
 
       <div className="mt-12 text-center text-[10px] uppercase tracking-[0.2em] font-bold text-slate-600">
-        © 2026 BusGo Technologies Private Limited. All Rights Reserved.
+        © 2026 SmartBus Technologies Private Limited. All Rights Reserved.
       </div>
     </div>
   </footer>

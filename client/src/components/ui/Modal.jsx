@@ -22,8 +22,8 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       />
       
       {/* Content */}
-      <div className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden animate-zoom-in">
-        <div className="flex items-center justify-between p-6 border-b border-slate-50">
+      <div className="relative bg-white w-full max-w-xl rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden animate-zoom-in max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b border-slate-50 flex-shrink-0">
           <h3 className="text-xl font-black text-slate-900">{title}</h3>
           <button 
             onClick={onClose}
@@ -33,7 +33,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
           </button>
         </div>
         
-        <div className="p-8">
+        <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
           {children}
         </div>
       </div>

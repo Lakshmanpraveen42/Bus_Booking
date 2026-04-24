@@ -1,0 +1,27 @@
+{
+  "common": {
+    "search": "Search",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "from": "From",
+    "to": "To",
+    "date": "Departure Date",
+    "buses": "Buses",
+    "help": "Help",
+    "home": "Home",
+    "about": "About Us",
+    "contact": "Contact",
+    "myBookings": "My Bookings"
+  },
+  "hero": {
+    "title": "Seamless Bookings. Premium Travel.",
+    "subtitle": "Join 5M+ travelers booking tickets across 10,000+ routes daily. Enjoy instant confirmation and best-in-class support.",
+    "badge": "India's Most Trusted Travel App"
+  },
+  "search": {
+    "placeholderFrom": "e.g. Mumbai",
+    "placeholderTo": "e.g. Pune",
+    "button": "Search"
+  }
+}

@@ -32,7 +32,7 @@ const PrivacyPolicy = () => {
     {
       icon: <Mail className="w-6 h-6 text-primary-500" />,
       title: 'Contact Us',
-      content: 'If you have any questions or concerns about our Privacy Policy, please contact us at privacy@busgo.com or through our contact page.'
+      content: 'If you have any questions or concerns about our Privacy Policy, please contact us at privacy@smartbus.com or through our contact page.'
     }
   ];
 
@@ -50,7 +50,7 @@ const PrivacyPolicy = () => {
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white mb-6">Privacy Policy</h1>
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Your privacy is our top priority. Learn how we protect your data and maintain your trust at BusGo.
+            Your privacy is our top priority. Learn how we protect your data and maintain your trust at SmartBus.
           </p>
           <div className="mt-8 text-sm text-slate-500 font-medium italic">
             Last Updated: April 22, 2026
@@ -78,7 +78,7 @@ const PrivacyPolicy = () => {
           <div className="mt-20 pt-12 border-t border-slate-100">
             <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Commitment to Transparency</h2>
             <p className="text-slate-600 text-center max-w-2xl mx-auto leading-relaxed">
-              At BusGo, we believe in being fully transparent about how we handle your data. This policy is designed to help you understand what information we collect, why we collect it, and how you can manage it.
+              At SmartBus, we believe in being fully transparent about how we handle your data. This policy is designed to help you understand what information we collect, why we collect it, and how you can manage it.
             </p>
           </div>
         </div>

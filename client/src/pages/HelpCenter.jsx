@@ -36,13 +36,13 @@ const HelpCenter = () => {
       <div className="bg-slate-950 pt-32 pb-48 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[120px] -mr-64 -mt-64"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] -ml-64 -mb-64"></div>
-        
+
         <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
           <h1 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight">How can we help you?</h1>
           <div className="relative max-w-2xl mx-auto">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Search for articles (e.g. refund status, cancellation policy)"
               className="w-full bg-white/10 border border-white/10 text-white rounded-2xl py-6 pl-16 pr-6 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all text-lg backdrop-blur-xl"
             />
@@ -87,7 +87,7 @@ const HelpCenter = () => {
         {/* Contact Strip */}
         <div className="bg-primary-600 rounded-[40px] p-12 overflow-hidden relative shadow-2xl shadow-primary-500/20">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
-          
+
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
             <div className="text-center lg:text-left max-w-xl">
               <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Still need assistance?</h2>
@@ -95,13 +95,13 @@ const HelpCenter = () => {
                 Our support team is available 24/7 to help you with any issues or queries you might have.
               </p>
             </div>
-            
+
             <div className="flex flex-wrap justify-center gap-6">
               <a href="tel:+918001234567" className="bg-white text-slate-900 px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:bg-slate-50 transition-all hover:scale-105 shadow-xl">
                 <Phone className="w-5 h-5 text-primary-500" />
                 Call Us
               </a>
-              <a href="mailto:support@busgo.com" className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:bg-slate-800 transition-all hover:scale-105 shadow-xl">
+              <a href="mailto:support@smartbus.com" className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:bg-slate-800 transition-all hover:scale-105 shadow-xl">
                 <Mail className="w-5 h-5 text-primary-400" />
                 Email Support
               </a>

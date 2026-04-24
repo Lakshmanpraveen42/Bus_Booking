@@ -1,6 +1,6 @@
 import React from 'react';
 import PageWrapper from '../components/layout/PageWrapper';
-import { ShieldCheck, HeartPulse, Luggage, Clock, CheckCircle2, FileText, AlertCircle, PhoneCall } from 'lucide-react';
+import { ShieldCheck, HeartPulse, Luggage, Clock, CheckCircle2, FileText, AlertCircle, PhoneCall, Smartphone } from 'lucide-react';
 
 const Insurance = () => {
   const benefits = [
@@ -39,7 +39,7 @@ const Insurance = () => {
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-white mb-8 leading-tight">Travel with <span className="text-emerald-400 italic">total peace of mind.</span></h1>
           <p className="text-slate-400 text-xl max-w-3xl mx-auto leading-relaxed">
-            Protect yourself and your loved ones with BusGo's comprehensive travel insurance, powered by leading global providers. Just ₹15 per passenger.
+            Protect yourself and your loved ones with SmartBus's comprehensive travel insurance, powered by leading global providers. Just ₹15 per passenger.
           </p>
         </div>
       </div>

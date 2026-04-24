@@ -3,10 +3,11 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { BOOKING_STATUS, GST_RATE, MAX_SEATS_PER_BOOKING } from '../utils/constants';
 import { bookingService } from '../services/bookingService';
 
-const computePricing = (selectedSeats, pricePerSeat) => {
+const computePricing = (selectedSeats, pricePerSeat, insuranceSelected = false) => {
   const baseFare = selectedSeats.length * pricePerSeat;
   const gst = Math.round(baseFare * GST_RATE);
-  return { baseFare, gst, total: baseFare + gst };
+  const insurance = insuranceSelected ? selectedSeats.length * 15 : 0;
+  return { baseFare, gst, insurance, total: baseFare + gst + insurance };
 };
 
 export const useBookingStore = create(
@@ -25,13 +26,18 @@ export const useBookingStore = create(
       passengers: [],
 
       // ─── Pricing ─────────────────────────────────────
-      pricing: { baseFare: 0, gst: 0, total: 0 },
+      pricing: { baseFare: 0, gst: 0, insurance: 0, total: 0 },
+      insuranceSelected: false,
 
       // ─── Booking state machine ────────────────────────
       bookingStatus: BOOKING_STATUS.IDLE,
       bookingId: null,
       bookingError: null,
       bookingData: null, // full normalized booking from service
+      
+      // ─── Route Points ──────────────────────────────
+      boardingPoint: null,
+      droppingPoint: null,
 
       // ══════════════════════════════════════════════════
       // ACTIONS
@@ -41,10 +47,17 @@ export const useBookingStore = create(
         set({ searchParams: params }),
 
       selectBus: (bus) =>
-        set({ selectedBus: bus, selectedSeats: [], pricing: computePricing([], bus.pricePerSeat) }),
+        set({ 
+          selectedBus: bus, 
+          selectedSeats: [], 
+          insuranceSelected: false,
+          pricing: computePricing([], bus.pricePerSeat),
+          boardingPoint: null,
+          droppingPoint: null
+        }),
 
       toggleSeat: (seatId) => {
-        const { selectedSeats, selectedBus } = get();
+        const { selectedSeats, selectedBus, insuranceSelected } = get();
         if (!selectedBus) return;
 
         const isSelected = selectedSeats.includes(seatId);
@@ -59,23 +72,38 @@ export const useBookingStore = create(
 
         set({
           selectedSeats: nextSeats,
-          pricing: computePricing(nextSeats, selectedBus.pricePerSeat),
+          pricing: computePricing(nextSeats, selectedBus.pricePerSeat, insuranceSelected),
+        });
+      },
+
+      toggleInsurance: (val) => {
+        const { selectedSeats, selectedBus } = get();
+        if (!selectedBus) return;
+        set({
+          insuranceSelected: val,
+          pricing: computePricing(selectedSeats, selectedBus.pricePerSeat, val),
         });
       },
 
       setPassengers: (passengers) => set({ passengers }),
 
+      setRoutePoints: (points) => set({ ...points }),
+
       confirmBooking: async () => {
-        const { selectedBus, selectedSeats, pricing } = get();
+        const { selectedBus, selectedSeats, pricing, passengers, insuranceSelected } = get();
 
         set({ bookingStatus: BOOKING_STATUS.PROCESSING, bookingError: null });
 
         try {
-          // Backend expects { trip_id, seat_numbers, total_amount }
+          // Backend expects { trip_id, seat_numbers, total_amount, passengers }
           const result = await bookingService.createBooking({
             tripId: selectedBus.tripId,
             selectedSeats,
             pricing,
+            passengers,
+            insurance: insuranceSelected,
+            boardingPoint: get().boardingPoint,
+            droppingPoint: get().droppingPoint,
           });
 
           set({
@@ -103,7 +131,8 @@ export const useBookingStore = create(
           selectedBus: null,
           selectedSeats: [],
           passengers: [],
-          pricing: { baseFare: 0, gst: 0, total: 0 },
+          insuranceSelected: false,
+          pricing: { baseFare: 0, gst: 0, insurance: 0, total: 0 },
           bookingStatus: BOOKING_STATUS.IDLE,
           bookingId: null,
           bookingError: null,
