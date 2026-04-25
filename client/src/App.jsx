@@ -4,6 +4,8 @@ import ChatWidget from './components/chatbot/ChatWidget';
 import ScrollToTop from './components/utils/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/useAuthStore';
+import { useAdminStore } from './store/useAdminStore';
+import { locationService } from './services/locationService';
 import {
   RequireSearch,
   RequireBus,
@@ -36,8 +38,9 @@ import MyBookings from './pages/MyBookings';
 import Profile from './pages/Profile';
 import CancellationPage from './pages/CancellationPage';
 import AdminDashboard from './pages/admin/Dashboard';
-import ManageBuses from './pages/admin/ManageBuses';
-import ManageRoutes from './pages/admin/ManageRoutes';
+import BusList from './pages/admin/buses/BusList';
+import RouteList from './pages/admin/routes/RouteList';
+import TripList from './pages/admin/trips/TripList';
 import AllBookings from './pages/admin/AllBookings';
 import ManageUsers from './pages/admin/ManageUsers';
 import Settings from './pages/admin/Settings';
@@ -45,10 +48,22 @@ import NotFound from './pages/NotFound';
 
 const App = () => {
   const init = useAuthStore((s) => s.init);
+  const setLocations = useAdminStore((s) => s.setLocations);
 
   useEffect(() => {
     init();
-  }, [init]);
+    
+    // Bootstrap locations from API
+    const syncData = async () => {
+      try {
+        const data = await locationService.getLocations();
+        setLocations(data);
+      } catch (err) {
+        console.error("Location sync failed", err);
+      }
+    };
+    syncData();
+  }, [init, setLocations]);
 
   return (
     <BrowserRouter>
@@ -57,7 +72,7 @@ const App = () => {
 
       {/* ChatWidget is rendered globally — visible on all pages */}
       <ChatWidget />
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 3000, style: { background: '#fff', color: '#1e293b', fontWeight: 'bold' } }} />
 
       <Routes>
         {/* Public */}
@@ -123,8 +138,9 @@ const App = () => {
 
         {/* Admin */}
         <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
-        <Route path="/admin/buses" element={<RequireAdmin><ManageBuses /></RequireAdmin>} />
-        <Route path="/admin/routes" element={<RequireAdmin><ManageRoutes /></RequireAdmin>} />
+        <Route path="/admin/buses" element={<RequireAdmin><BusList /></RequireAdmin>} />
+        <Route path="/admin/routes" element={<RequireAdmin><RouteList /></RequireAdmin>} />
+        <Route path="/admin/trips" element={<RequireAdmin><TripList /></RequireAdmin>} />
         <Route path="/admin/bookings" element={<RequireAdmin><AllBookings /></RequireAdmin>} />
         <Route path="/admin/users" element={<RequireAdmin><ManageUsers /></RequireAdmin>} />
         <Route path="/admin/settings" element={<RequireAdmin><Settings /></RequireAdmin>} />

@@ -150,7 +150,10 @@ const Profile = () => {
               </div>
 
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl font-black text-slate-900 mb-2">{user?.name}</h1>
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
+                  <h1 className="text-3xl font-black text-slate-900">{user?.name}</h1>
+                  <span className="px-3 py-1 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">{user?.id}</span>
+                </div>
                 <p className="text-slate-500 font-medium flex items-center justify-center md:justify-start gap-2">
                   <MapPin className="w-4 h-4" />
                   India • Verified Explorer
@@ -204,6 +207,7 @@ const Profile = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-6">
                         <ProfileField label="Full Name" value={user?.name || 'Not provided'} icon={<User className="w-4 h-4" />} />
+                        <ProfileField label="Traveler ID" value={user?.id} icon={<Shield className="w-4 h-4" />} />
                         <ProfileField label="Email Address" value={user?.email} icon={<Mail className="w-4 h-4" />} />
                         <ProfileField label="Phone Number" value={user?.phone || 'Not provided'} icon={<Phone className="w-4 h-4" />} />
                       </div>

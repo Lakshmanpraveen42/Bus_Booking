@@ -1,116 +1,198 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { 
+  ArrowLeftRight, Search, SlidersHorizontal, 
+  MapPin, Calendar, ChevronDown, RotateCw
+} from 'lucide-react';
 import PageWrapper from '../components/layout/PageWrapper';
 import BusCard from '../components/bus/BusCard';
-import FilterSidebar from '../components/bus/FilterSidebar';
-import SortBar from '../components/bus/SortBar';
-import { BusCardSkeleton } from '../components/ui/Skeleton';
-import { EmptyState, ErrorState } from '../components/bus/States';
-import { useBuses } from '../hooks/useBuses';
+import EmptyState from '../components/bus/EmptyState';
+import { busService } from '../services/busService';
+import { seatService } from '../services/seatService';
 import { useBookingStore } from '../store/useBookingStore';
-import { SORT_OPTIONS, DEPARTURE_SLOTS } from '../utils/constants';
-import { timeToMinutes, formatDate } from '../utils/formatters';
-
-const DEFAULT_FILTERS = { priceMax: 5000, departureSlots: [], busTypes: [] };
-
-const applyFiltersAndSort = (buses, filters, sortBy) => {
-  let result = buses.filter((b) => {
-    if (b.pricePerSeat > filters.priceMax) return false;
-    if (filters.busTypes.length > 0 && !filters.busTypes.includes(b.busType)) return false;
-    if (filters.departureSlots.length > 0) {
-      const depMin = timeToMinutes(b.departureTime);
-      const depHour = depMin / 60;
-      const inSlot = filters.departureSlots.some((slotId) => {
-        const slot = DEPARTURE_SLOTS.find((s) => s.id === slotId);
-        return slot && depHour >= slot.range[0] && depHour < slot.range[1];
-      });
-      if (!inSlot) return false;
-    }
-    return true;
-  });
-
-  switch (sortBy) {
-    case SORT_OPTIONS.PRICE_ASC:     result.sort((a, b) => a.pricePerSeat - b.pricePerSeat); break;
-    case SORT_OPTIONS.PRICE_DESC:    result.sort((a, b) => b.pricePerSeat - a.pricePerSeat); break;
-    case SORT_OPTIONS.DEPARTURE_EARLY: result.sort((a, b) => timeToMinutes(a.departureTime) - timeToMinutes(b.departureTime)); break;
-    case SORT_OPTIONS.DEPARTURE_LATE:  result.sort((a, b) => timeToMinutes(b.departureTime) - timeToMinutes(a.departureTime)); break;
-    case SORT_OPTIONS.RATING:        result.sort((a, b) => b.rating - a.rating); break;
-    case SORT_OPTIONS.DURATION:      result.sort((a, b) => a.durationMinutes - b.durationMinutes); break;
-    default: break;
-  }
-  return result;
-};
+import { BusCardSkeleton } from '../components/ui/Skeleton';
+import { toast } from 'react-hot-toast';
 
 const BusListing = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const searchParams = useBookingStore((s) => s.searchParams);
-  const { data: buses, loading, error, refetch } = useBuses(searchParams);
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
-  const [sortBy, setSortBy] = useState(SORT_OPTIONS.DEPARTURE_EARLY);
+  const [buses, setBuses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  const [source, setSource] = useState(searchParams.get('source') || '');
+  const [destination, setDestination] = useState(searchParams.get('destination') || '');
+  const [date, setDate] = useState(searchParams.get('date') || '');
 
-  const filtered = useMemo(
-    () => applyFiltersAndSort(buses, filters, sortBy),
-    [buses, filters, sortBy]
-  );
+  const setSelectedBus = useBookingStore((s) => s.setSelectedBus);
+
+  useEffect(() => {
+    const fetchBuses = async () => {
+      try {
+        setLoading(true);
+        const data = await busService.searchBuses({
+          source: searchParams.get('source'),
+          destination: searchParams.get('destination'),
+          date: searchParams.get('date')
+        });
+        setBuses(data);
+      } catch (err) {
+        toast.error("Failed to load trips.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBuses();
+  }, [searchParams]);
 
   return (
-    <PageWrapper>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Top Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-          <div>
-            <nav className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
-              <button onClick={() => navigate('/')} className="hover:text-primary-500 transition-colors">Home</button>
-              <span>/</span>
-              <span className="text-slate-900">{searchParams?.from} to {searchParams?.to}</span>
-            </nav>
-            <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
-              Available <span className="text-primary-500">Buses</span>
-              <span className="text-sm font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-full">{filtered.length}</span>
-            </h1>
+    <PageWrapper className="bg-slate-50 min-h-screen pt-[76px]">
+      
+      {/* 🔴 REFERENCE-MATCHED SEARCH BAR */}
+      <div className="bg-white border-b border-slate-100 py-4 shadow-sm sticky top-[76px] z-40">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-4">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-0 items-center border border-slate-200 rounded-lg overflow-hidden">
+             
+             {/* From */}
+             <div className="md:col-span-4 flex items-center gap-3 px-4 py-3 bg-white border-r border-slate-200">
+                <MapPin className="w-5 h-5 text-emerald-500" />
+                <div>
+                   <input value={source} onChange={(e) => setSource(e.target.value)} className="w-full text-sm font-bold bg-transparent outline-none placeholder:text-slate-300" placeholder="Anantapur" />
+                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">APT</p>
+                </div>
+             </div>
+
+             {/* Swap */}
+             <button className="hidden md:flex absolute left-[32.6%] -translate-x-1/2 bg-white border border-slate-200 rounded-full w-8 h-8 items-center justify-center text-slate-400 hover:text-primary-500 z-10">
+                <ArrowLeftRight className="w-4 h-4" />
+             </button>
+
+             {/* To */}
+             <div className="md:col-span-4 flex items-center gap-3 px-8 py-3 bg-white border-r border-slate-200">
+                <MapPin className="w-5 h-5 text-rose-500" />
+                <div>
+                   <input value={destination} onChange={(e) => setDestination(e.target.value)} className="w-full text-sm font-bold bg-transparent outline-none placeholder:text-slate-300" placeholder="Guntur" />
+                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">GNT</p>
+                </div>
+             </div>
+
+             {/* Date */}
+             <div className="md:col-span-4 flex items-center gap-3 px-4 py-3 bg-white">
+                <Calendar className="w-5 h-5 text-slate-400" />
+                <div>
+                   <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full text-sm font-bold bg-transparent outline-none" />
+                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">Monday</p>
+                </div>
+             </div>
           </div>
-          
-          {searchParams?.date && (
-            <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100">
-              <Calendar className="w-4 h-4 text-primary-500" />
-              <span className="text-sm font-bold text-slate-700">{formatDate(searchParams.date)}</span>
-            </div>
-          )}
+
+          <button 
+            onClick={() => setSearchParams({ source, destination, date })}
+            className="w-full md:w-auto h-14 px-8 bg-[#e32e33] text-white rounded-lg font-bold text-sm transition-all hover:bg-[#c1272c]"
+          >
+            Modify Search
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* 🟢 REFERENCE-MATCHED FILTERS SIDEBAR */}
+        <div className="lg:col-span-3 space-y-6">
+          <div className="bg-white rounded-xl border border-slate-100 p-6 shadow-sm">
+             <div className="flex items-center justify-between mb-8">
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Filters</h3>
+                <button className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Reset</button>
+             </div>
+
+             <FilterSection title="Departure Time">
+                <FilterOption label="Morning (12 AM - 12 PM)" count="120" />
+                <FilterOption label="Afternoon (12 PM - 4 PM)" count="85" />
+                <FilterOption label="Evening (4 PM - 8 PM)" count="64" checked />
+                <FilterOption label="Night (8 PM - 12 AM)" count="91" />
+             </FilterSection>
+
+             <FilterSection title="Bus Type">
+                <FilterOption label="AC Seater" count="112" />
+                <FilterOption label="AC Sleeper" count="98" />
+                <FilterOption label="Non AC Seater" count="34" />
+                <FilterOption label="Non AC Sleeper" count="16" />
+             </FilterSection>
+
+             <FilterSection title="Amenities">
+                <FilterOption label="Live Tracking" count="126" />
+                <FilterOption label="Charging Point" count="118" />
+                <FilterOption label="Water Bottle" count="90" />
+                <FilterOption label="Blanket" count="72" />
+                <p className="text-[10px] font-bold text-primary-500 mt-2 cursor-pointer">+ More</p>
+             </FilterSection>
+
+             <div className="mt-8 pt-8 border-t border-slate-50">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Price Range</h4>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full relative">
+                   <div className="absolute left-0 right-0 h-full bg-rose-500 rounded-full" />
+                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-rose-500 rounded-full shadow-sm" />
+                   <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-rose-500 rounded-full shadow-sm" />
+                </div>
+                <div className="flex items-center justify-between mt-4">
+                   <span className="text-[10px] font-bold text-slate-500">₹300</span>
+                   <span className="text-[10px] font-bold text-slate-500">₹2000+</span>
+                </div>
+             </div>
+          </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-10 items-start">
-          {/* Unified Sidebar */}
-          <FilterSidebar filters={filters} onChange={setFilters} />
+        {/* 🔵 LISTING AREA */}
+        <div className="lg:col-span-9">
+          <div className="flex items-center justify-between mb-6">
+             <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{buses.length} BUSES FOUND</h2>
+             <div className="flex items-center gap-4">
+                <span className="text-[11px] font-bold text-slate-400">Sort by:</span>
+                <select className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-[11px] font-bold text-slate-600 outline-none">
+                   <option>Price - Low to High</option>
+                   <option>Departure Time</option>
+                   <option>Rating</option>
+                </select>
+             </div>
+          </div>
 
-          {/* Result List */}
-          <div className="flex-1 min-w-0 w-full">
-            <div className="mb-6">
-              <SortBar activeSort={sortBy} onSort={setSortBy} resultCount={filtered.length} />
-            </div>
-
+          <div className="space-y-4">
             {loading ? (
-              <div className="space-y-6">
-                {[1, 2, 3].map((i) => <BusCardSkeleton key={i} />)}
-              </div>
-            ) : error ? (
-              <ErrorState message={error} onRetry={refetch} />
-            ) : filtered.length === 0 ? (
-              <EmptyState from={searchParams?.from} to={searchParams?.to} date={searchParams?.date} />
+              [...Array(4)].map((_, i) => <BusCardSkeleton key={i} />)
+            ) : buses.length > 0 ? (
+              buses.map((bus) => (
+                <BusCard key={bus.id} bus={bus} onSelect={async () => {
+                   setSelectedBus(bus);
+                   navigate(`/seats/${bus.id}`);
+                }} />
+              ))
             ) : (
-              <div className="space-y-6">
-                {filtered.map((bus, index) => (
-                  <div key={bus.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 80}ms` }}>
-                    <BusCard bus={bus} />
-                  </div>
-                ))}
-              </div>
+               <EmptyState source={source} destination={destination} date={date} onNextDay={() => {}} onRetry={() => setLoading(true)} />
             )}
           </div>
         </div>
+
       </div>
     </PageWrapper>
   );
 };
+
+const FilterSection = ({ title, children }) => (
+  <div className="mb-8 last:mb-0">
+    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{title}</h4>
+    <div className="space-y-3">{children}</div>
+  </div>
+);
+
+const FilterOption = ({ label, count, checked }) => (
+  <div className="flex items-center justify-between group cursor-pointer">
+    <div className="flex items-center gap-3">
+       <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${checked ? 'bg-rose-500 border-rose-500' : 'bg-white border-slate-200 group-hover:border-rose-300'}`}>
+          {checked && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+       </div>
+       <span className={`text-[11px] font-bold ${checked ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>{label}</span>
+    </div>
+    <span className="text-[10px] font-bold text-slate-300">{count}</span>
+  </div>
+);
 
 export default BusListing;

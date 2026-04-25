@@ -24,11 +24,12 @@ const Dashboard = () => {
         setData({ 
           bookings: bookings.slice(0, 5), 
           buses: buses,
-          totalBookings: bookings.length,
-          totalRevenue: bookings.reduce((acc, b) => acc + (b.total_amount || 0), 0)
+          totalBookings: bookings.length || 0,
+          totalRevenue: bookings.reduce((acc, b) => acc + (Number(b.total_amount) || 0), 0)
         });
       } catch (err) {
-        console.error('Failed to load dashboard data');
+        console.error('Failed to load dashboard data', err);
+        setData({ bookings: [], buses: [], totalBookings: 0, totalRevenue: 0 });
       } finally {
         setLoading(false);
       }

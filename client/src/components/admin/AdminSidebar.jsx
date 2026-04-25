@@ -8,10 +8,10 @@ const AdminSidebar = ({ onClose }) => {
   const { logout } = useAuthStore();
 
   const menuItems = [
-    { icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard', path: '/admin' },
-    { icon: <Bus className="w-5 h-5" />, label: 'Manage Buses', path: '/admin/buses' },
-    { icon: <Map className="w-5 h-5" />, label: 'Route Scheduler', path: '/admin/routes' },
-    { icon: <Ticket className="w-5 h-5" />, label: 'All Bookings', path: '/admin/bookings' },
+    { icon: <LayoutDashboard className="w-5 h-5" />, label: 'Overview', path: '/admin' },
+    { icon: <Map className="w-5 h-5" />, label: 'Route Templates', path: '/admin/routes' },
+    { icon: <Ticket className="w-5 h-5" />, label: 'Trip Scheduler', path: '/admin/trips' },
+    { icon: <Bus className="w-5 h-5" />, label: 'Fleet Manager', path: '/admin/buses' },
     { icon: <Users className="w-5 h-5" />, label: 'User Database', path: '/admin/users' },
   ];
 

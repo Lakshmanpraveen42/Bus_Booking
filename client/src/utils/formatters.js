@@ -87,3 +87,15 @@ export const formatSeatsLeft = (count) => {
   if (count <= 5) return `Only ${count} left!`;
   return `${count} seats available`;
 };
+
+/**
+ * Convert duration strings like "12h 30m" or "12h" into total minutes for sorting.
+ */
+export const durationToMinutes = (durStr) => {
+  if (!durStr) return 0;
+  const hMatch = durStr.match(/(\d+)h/);
+  const mMatch = durStr.match(/(\d+)m/);
+  const h = hMatch ? parseInt(hMatch[1]) : 0;
+  const m = mMatch ? parseInt(mMatch[1]) : 0;
+  return h * 60 + m;
+};

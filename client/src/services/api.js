@@ -1,51 +1,48 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/v1';
-
+/**
+ * Standardized Axios Instance
+ * Base URL is dynamically pulled from environment variables.
+ */
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor to attach JWT token to every request
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    // Production-grade Logging
-    console.group(`🚀 API Request: ${config.method.toUpperCase()} ${config.url}`);
-    if (config.data) {
-        const logData = typeof config.data === 'string' ? Object.fromEntries(new URLSearchParams(config.data)) : { ...config.data };
-        if (logData.password) logData.password = '********';
-        console.log('Payload:', logData);
-    }
-    console.groupEnd();
-
-    return config;
-  },
-  (error) => {
-    console.error('❌ Request Error:', error);
-    return Promise.reject(error);
+// Request interceptor for Auth & Identity
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  const userStr = localStorage.getItem('user');
+  
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
 
-// Interceptor to log responses
+  // Inject User ID into every request header for backend tracking
+  if (userStr && userStr !== 'undefined') {
+    try {
+      const user = JSON.parse(userStr);
+      if (user?.id) {
+        config.headers['X-User-ID'] = user.id;
+      }
+    } catch (e) {
+      console.error("Identity injection failed", e);
+    }
+  }
+  
+  return config;
+});
+
+// Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => {
-    console.group(`✅ API Response: ${response.status} ${response.config.url}`);
-    console.log('Result:', response.data);
-    console.groupEnd();
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.group(`❌ API Error: ${error.response?.status || 'Network Error'} ${error.config?.url}`);
-    console.error('Details:', error.response?.data || error.message);
-    console.groupEnd();
+    // If backend is not available
+    if (!error.response && error.code === 'ERR_NETWORK') {
+      console.warn("Backend Unreachable: Using frontend mock fallback");
+    }
     return Promise.reject(error);
   }
 );

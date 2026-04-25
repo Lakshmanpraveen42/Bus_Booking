@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Calendar, ArrowLeftRight, Search, ChevronRight, ShieldCheck, Zap, Headphones, CreditCard, Bus } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/ui/Button';
 import { useBookingStore } from '../store/useBookingStore';
+import { useAdminStore } from '../store/useAdminStore';
 import { POPULAR_ROUTES } from '../utils/constants';
 import { tripService } from '../services/tripService';
 import staticCities from '../data/cities.json';
@@ -16,12 +18,14 @@ const DEFAULT_DATE = format(addDays(new Date(), 1), 'yyyy-MM-dd');
 /** City autocomplete input */
 const CityInput = ({ id, label, value, onChange, placeholder, icon: Icon, cities }) => {
   const [open, setOpen] = useState(false);
+  
+  // Show filtered results if typing, or top 6 if empty
   const filtered = value.length > 0
-    ? cities.filter((c) => c.toLowerCase().includes(value.toLowerCase()) && c.toLowerCase() !== value.toLowerCase()).slice(0, 6)
-    : [];
+    ? cities.filter((c) => c.toLowerCase().includes(value.toLowerCase())).slice(0, 10)
+    : cities.slice(0, 6);
 
   return (
-    <div className="relative flex-1 min-w-0" style={{ zIndex: 9999 }}>
+    <div className="relative flex-1 min-w-0" style={{ zIndex: open ? 100 : 10 }}>
       <label htmlFor={id} className="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">
         {label}
       </label>
@@ -33,36 +37,41 @@ const CityInput = ({ id, label, value, onChange, placeholder, icon: Icon, cities
           id={id}
           value={value}
           onChange={(e) => { onChange(e.target.value); setOpen(true); }}
-          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          onBlur={() => setTimeout(() => setOpen(false), 200)}
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
           autoComplete="off"
           className="w-full pl-12 pr-4 py-4 rounded-2xl text-slate-900 text-base font-bold bg-white border-2 border-transparent focus:border-primary-500 focus:outline-none transition-all shadow-sm placeholder:text-slate-300"
         />
       </div>
-      {open && filtered.length > 0 && (
+      {open && (
         <ul 
-          className="absolute top-full mt-2 left-0 right-0 rounded-2xl border border-slate-200 overflow-hidden animate-fade-in py-1 shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
-          style={{ backgroundColor: 'white', opacity: 1, zIndex: 99999 }}
+          className="absolute top-full mt-2 left-0 right-0 rounded-2xl border border-slate-200 overflow-hidden animate-fade-in py-1 shadow-[0_30px_60px_rgba(0,0,0,0.15)] bg-white"
+          style={{ zIndex: 999 }}
         >
-          {filtered.map((city) => (
-            <li key={city} style={{ backgroundColor: 'white' }}>
-              <button
-                type="button"
-                onMouseDown={() => { onChange(city); setOpen(false); }}
-                className="w-full text-left px-5 py-4 text-sm font-bold text-slate-900 hover:bg-slate-50 hover:text-primary-600 flex items-center gap-4 transition-all group"
-                style={{ backgroundColor: 'white' }}
-              >
-                <div className="w-10 h-10 rounded-xl bg-slate-50 group-hover:bg-primary-50 flex items-center justify-center text-slate-400 group-hover:text-primary-500 transition-colors">
-                  <MapPin className="w-5 h-5 transition-transform group-hover:scale-110" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-base font-bold uppercase tracking-tight">{city}</span>
-                  <span className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Available Station</span>
-                </div>
-              </button>
+          {filtered.length > 0 ? (
+            filtered.map((city) => (
+              <li key={city} className="bg-white">
+                <button
+                  type="button"
+                  onMouseDown={() => { onChange(city); setOpen(false); }}
+                  className="w-full text-left px-5 py-4 text-sm font-bold text-slate-900 hover:bg-slate-50 hover:text-primary-600 flex items-center gap-4 transition-all group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 group-hover:bg-primary-50 flex items-center justify-center text-slate-400 group-hover:text-primary-500 transition-colors">
+                    <MapPin className="w-5 h-5 transition-transform group-hover:scale-110" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-base font-bold uppercase tracking-tight">{city}</span>
+                    <span className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Available Station</span>
+                  </div>
+                </button>
+              </li>
+            ))
+          ) : (
+            <li className="px-5 py-6 text-center text-slate-400 bg-white">
+              <p className="text-xs font-black uppercase tracking-widest opacity-50 italic">No locations found</p>
             </li>
-          ))}
+          )}
         </ul>
       )}
     </div>
@@ -75,33 +84,45 @@ const Home = () => {
   const [to, setTo] = useState('');
   const [date, setDate] = useState(DEFAULT_DATE);
   const [error, setError] = useState('');
-  const [dynamicCities, setDynamicCities] = useState(staticCities);
+  
+  // Use globally synchronized locations from the API
+  const apiLocations = useAdminStore((s) => s.locations);
+  const cities = apiLocations.length > 0 ? apiLocations : staticCities;
+
+  // Mutually exclusive location filtering
+  const fromCities = cities.filter(c => c !== to);
+  const toCities = cities.filter(c => c !== from);
+
   const navigate = useNavigate();
   const setSearchParams = useBookingStore((s) => s.setSearchParams);
-
-  // Fetch unique locations on mount
-  useEffect(() => {
-    const loadLocations = async () => {
-      const liveLocations = await tripService.getLocations();
-      if (liveLocations && liveLocations.length > 0) {
-        // Merge with static list and remove duplicates
-        const merged = Array.from(new Set([...staticCities, ...liveLocations]));
-        setDynamicCities(merged);
-      }
-    };
-    loadLocations();
-  }, []);
 
   const handleSwap = () => { setFrom(to); setTo(from); };
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (!from.trim() || !to.trim()) { setError('Please enter both source and destination.'); return; }
-    if (from.toLowerCase() === to.toLowerCase()) { setError('Source and destination cannot be the same.'); return; }
+    
+    // Strict Validation
+    if (from.toLowerCase() === to.toLowerCase()) { 
+      const msg = 'Source and destination cannot be the same.';
+      setError(msg); 
+      toast.error(msg);
+      return; 
+    }
+    
     if (!date) { setError('Please select a travel date.'); return; }
     setError('');
-    setSearchParams({ from: from.trim(), to: to.trim(), date });
-    navigate('/buses');
+
+    // Pre-sync store to allow RequireSearch guard to pass
+    setSearchParams({ source: from.trim(), destination: to.trim(), date });
+    
+    // Navigate with Query Params
+    const params = new URLSearchParams({ 
+      source: from.trim(), 
+      destination: to.trim(), 
+      date 
+    });
+    navigate(`/buses?${params.toString()}`);
   };
 
   const handlePopularRoute = ({ from: f, to: t }) => {
@@ -151,7 +172,7 @@ const Home = () => {
                     onChange={setFrom} 
                     placeholder={t('search.placeholderFrom')} 
                     icon={MapPin} 
-                    cities={dynamicCities}
+                    cities={fromCities}
                   />
                 </div>
 
@@ -176,7 +197,7 @@ const Home = () => {
                     onChange={setTo} 
                     placeholder={t('search.placeholderTo')} 
                     icon={MapPin} 
-                    cities={dynamicCities}
+                    cities={toCities}
                   />
                 </div>
 

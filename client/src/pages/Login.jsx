@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import PageWrapper from '../components/layout/PageWrapper';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
@@ -8,7 +8,9 @@ import { useAuthStore } from '../store/useAuthStore';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, loading, error } = useAuthStore();
+  const location = useLocation();
+  const { login, adminLogin, loading, error } = useAuthStore();
+  const [isAdmin, setIsAdmin] = useState(false);
   
   const [formData, setFormData] = useState({
     email: '',
@@ -23,11 +25,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await login(formData.email, formData.password);
+    const success = isAdmin 
+      ? await adminLogin(formData.email, formData.password)
+      : await login(formData.email, formData.password);
+
     if (success) {
       const user = useAuthStore.getState().user;
-      console.log(`DEBUG: Logged in as => ${user?.is_admin ? 'ADMIN' : 'USER'}`, user);
-      navigate(user?.is_admin ? '/admin' : '/');
+      const from = location.state?.from || (user?.is_admin ? '/admin' : '/');
+      navigate(from, { replace: true });
     }
   };
 
@@ -37,11 +42,17 @@ const Login = () => {
         <div className="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 p-10 border border-slate-100">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-primary-500">
-               <LogIn className="w-8 h-8" />
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-all duration-500
+              ${isAdmin ? 'bg-slate-900 text-white rotate-12 shadow-xl shadow-slate-900/20' : 'bg-primary-500/10 text-primary-500'}
+            `}>
+               {isAdmin ? <Lock className="w-8 h-8" /> : <LogIn className="w-8 h-8" />}
             </div>
-            <h1 className="text-3xl font-black text-slate-900 mb-2">Welcome Back</h1>
-            <p className="text-slate-500">Login to manage your bookings and trips.</p>
+            <h1 className="text-3xl font-black text-slate-900 mb-2">
+              {isAdmin ? 'Admin Portal' : 'Welcome Back'}
+            </h1>
+            <p className="text-slate-500">
+              {isAdmin ? 'Authenticate for system-wide access.' : 'Login to manage your bookings and trips.'}
+            </p>
           </div>
 
           {error && (
@@ -53,7 +64,7 @@ const Login = () => {
           {/* Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <Input 
-              label="Email Address" 
+              label={isAdmin ? "Staff Email" : "Email Address"} 
               name="email"
               type="email" 
               placeholder="name@example.com"
@@ -82,47 +93,51 @@ const Login = () => {
                 }
                 required
               />
-              <div className="text-right">
-                <button type="button" className="text-xs font-bold text-primary-500 hover:text-primary-600 transition-colors">
-                  Forgot Password?
-                </button>
-              </div>
+              {!isAdmin && (
+                <div className="text-right">
+                  <button type="button" className="text-xs font-bold text-primary-500 hover:text-primary-600 transition-colors">
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
             </div>
 
-            <Button fullWidth size="xl" type="submit" shadow loading={loading}>
-              {loading ? 'Signing In...' : 'Sign In'}
+            <Button 
+              fullWidth 
+              size="xl" 
+              type="submit" 
+              shadow 
+              loading={loading}
+              className={isAdmin ? 'bg-slate-900 hover:bg-black' : ''}
+            >
+              {loading ? 'Authenticating...' : (isAdmin ? 'Access Portal' : 'Sign In')}
             </Button>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-10">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-100"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
-              <span className="px-4 bg-white text-slate-400">Or continue with</span>
-            </div>
-          </div>
-
-          {/* Social Logins */}
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-3 py-3 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-all font-bold text-sm">
-              <Chrome className="w-5 h-5 text-red-500" />
-              Google
-            </button>
-            <button className="flex items-center justify-center gap-3 py-3 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-all font-bold text-sm">
-              <Github className="w-5 h-5 text-slate-900" />
-              Github
-            </button>
-          </div>
-
           {/* Footer */}
-          <p className="mt-10 text-center text-sm text-slate-500 font-medium">
-            Don't have an account? {' '}
-            <Link to="/signup" className="text-primary-500 font-black hover:underline underline-offset-4">
-              Sign Up
-            </Link>
-          </p>
+          <div className="mt-10 flex flex-col gap-4 text-center">
+            <p className="text-sm text-slate-500 font-medium">
+              {!isAdmin ? (
+                <>Don't have an account? <Link to="/signup" className="text-primary-500 font-black hover:underline">Sign Up</Link></>
+              ) : (
+                <button 
+                  onClick={() => setIsAdmin(false)} 
+                  className="text-primary-500 font-black hover:underline"
+                >
+                  Return to User Login
+                </button>
+              )}
+            </p>
+
+            {!isAdmin && (
+              <button 
+                onClick={() => setIsAdmin(true)}
+                className="text-[10px] uppercase font-black tracking-widest text-slate-300 hover:text-slate-900 transition-colors"
+              >
+                Staff Portal Access
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </PageWrapper>

@@ -1,40 +1,49 @@
 import api from './api';
 
 export const bookingService = {
-  async createBooking(payload) {
+  /**
+   * Create a new booking
+   * @param {Object} bookingData - The booking payload
+   */
+  async createBooking(bookingData) {
     try {
-      // payload from store: { tripId, selectedSeats, pricing }
-      // Backend expects: { trip_id, seat_numbers, total_amount }
-      const response = await api.post('/bookings/', {
-        trip_id: payload.tripId,
-        seat_numbers: payload.selectedSeats.join(','),
-        total_amount: payload.pricing.total,
-        passengers: payload.passengers,
-        boarding_point: payload.boardingPoint,
-        dropping_point: payload.droppingPoint
+      const response = await api.post('/bookings', bookingData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get all bookings for a specific user
+   * @param {string} userId - The unique user ID
+   */
+  async getMyBookings(userId) {
+    try {
+      const response = await api.get(`/users/${userId}/bookings`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user bookings:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Cancel a specific booking
+   * @param {string} userId - User ID requesting cancellation
+   * @param {number} bookingId - The ID of the booking to cancel
+   */
+  async cancelBooking(userId, bookingId) {
+    try {
+      const response = await api.post('/bookings/cancel', {
+        user_id: userId,
+        booking_id: parseInt(bookingId)
       });
-      
       return response.data;
-    } catch (err) {
-      throw new Error(err.response?.data?.detail || 'Booking failed');
-    }
-  },
-
-  async getMyBookings() {
-    try {
-      const response = await api.get('/bookings/me');
-      return response.data;
-    } catch (err) {
-      throw new Error(err.response?.data?.detail || 'Failed to load bookings');
-    }
-  },
-
-  async cancelBooking(bookingId) {
-    try {
-      const response = await api.post(`/bookings/${bookingId}/cancel`);
-      return response.data;
-    } catch (err) {
-      throw new Error(err.response?.data?.detail || 'Cancellation failed');
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      throw error;
     }
   }
 };

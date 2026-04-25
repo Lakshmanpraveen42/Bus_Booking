@@ -1,55 +1,42 @@
 import api from './api';
-import { format, parseISO, differenceInMinutes } from 'date-fns';
+import dayjs from 'dayjs';
 
 /**
- * Mapper: Normalizes the new FastAPI Backend response into the UI shape.
+ * Normalizes the latest Backend response into UI-ready state.
  */
 export const mapBusData = (trip) => {
-  const depDate = parseISO(trip.departure_time);
-  const arrDate = parseISO(trip.arrival_time);
-  
   return {
-    id: trip.id,
-    tripId: trip.id,
-    operatorName: trip.bus.name,
-    operatorLogo: null,
-    busType: trip.bus.category,
-    busSubType: trip.bus.vehicle_number,
-    departureTime: format(depDate, 'HH:mm'),
-    arrivalTime: format(arrDate, 'HH:mm'),
-    durationMinutes: differenceInMinutes(arrDate, depDate),
-    from: trip.source,
-    to: trip.destination,
-    date: format(depDate, 'yyyy-MM-dd'),
-    seatsAvailable: trip.bus.total_seats, // TODO: Update backend to return real availability
-    totalSeats: trip.bus.total_seats,
-    pricePerSeat: trip.price,
-    rating: 4.5, // Default for now
-    reviewCount: 120, // Default for now
-    amenities: ['CCTV', 'Charging Point', 'Water Bottle'],
-    pickupPoints: [],
-    dropPoints: [],
+    id: trip.trip_id,
+    busName: trip.bus_name,
+    busNumber: trip.bus_number,
+    busType: trip.bus_type,
+    departureTime: dayjs(trip.departure_time).format("hh:mm A"),
+    arrivalTime: dayjs(trip.arrival_time).format("hh:mm A"),
+    duration: trip.trip_duration,
+    price: trip.price,
+    availableSeats: trip.available_seats,
+    routingPoints: trip.routing_points || [],
+    source: trip.source,
+    destination: trip.destination,
+    matchDetails: trip.match_details,
+    raw: trip
   };
 };
 
 export const busService = {
-  async searchBuses({ from, to, date }) {
+  async searchBuses({ source, destination, date }) {
     try {
-      const response = await api.get('/trips/search', {
-        params: { source: from, destination: to, date }
+      const response = await api.get('/search', {
+        params: { 
+          source: source, 
+          destination: destination, 
+          travel_date: date 
+        }
       });
-      return response.data.map(mapBusData);
+      return (response.data || []).map(mapBusData);
     } catch (err) {
-      throw new Error(err.response?.data?.detail || 'Failed to fetch buses');
-    }
-  },
-
-  async getBusById(busId) {
-    try {
-      const response = await api.get(`/trips/${busId}`);
-      return mapBusData(response.data);
-    } catch (err) {
-      throw new Error(err.response?.data?.detail || 'Bus not found');
+      console.error("Search API Error:", err);
+      throw new Error(err.response?.data?.detail || 'Search service is temporarily unavailable');
     }
   },
 };

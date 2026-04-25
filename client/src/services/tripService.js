@@ -3,7 +3,7 @@ import api from './api';
 export const tripService = {
   async getLocations() {
     try {
-      const response = await api.get('/trips/locations');
+      const response = await api.get('/locations');
       return response.data;
     } catch (err) {
       console.error('Error fetching locations:', err);

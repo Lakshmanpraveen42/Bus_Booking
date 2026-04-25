@@ -46,12 +46,29 @@ export const useBookingStore = create(
       setSearchParams: (params) =>
         set({ searchParams: params }),
 
+      setSelectedBus: (bus) =>
+        set({ 
+          selectedBus: bus, 
+          selectedSeats: [], 
+          insuranceSelected: false,
+          pricing: computePricing([], bus.price || 0),
+          boardingPoint: null,
+          droppingPoint: null,
+          bookingStatus: BOOKING_STATUS.IDLE
+        }),
+
+      setSeatData: (data) => 
+        set({ seatLayout: data }),
+
+      setBookingData: (data) =>
+        set({ ...data }),
+
       selectBus: (bus) =>
         set({ 
           selectedBus: bus, 
           selectedSeats: [], 
           insuranceSelected: false,
-          pricing: computePricing([], bus.pricePerSeat),
+          pricing: computePricing([], bus.price || 0),
           boardingPoint: null,
           droppingPoint: null
         }),
