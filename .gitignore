@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[c]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Databases & Large Files
+*.db
+*.sqlite3
+sessions.json
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+app.log
+
+# Generated Assets
+tickets/
+*.pdf
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store
+
+# UV / Dependency managers
+.uv
+uv.lock
