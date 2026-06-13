@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 # Load .env from project root
 env_path = Path(__file__).parent.parent / ".env"
-load_dotenv(dotenv_path=env_path)
+load_dotenv(dotenv_path=env_path, override=True)
 
 class Settings:
     PROJECT_NAME: str = "SmartBus API"
@@ -15,7 +15,7 @@ class Settings:
         
         # SMTP Settings
         self.SMTP_SERVER = os.getenv("MAIL_SERVER", "smtp.gmail.com")
-        self.SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+        self.SMTP_PORT = int(os.getenv("SMTP_PORT", os.getenv("MAIL_PORT", 587)))
         self.SMTP_USER = os.getenv("MAIL_USERNAME", "")
         self.SMTP_PASSWORD = os.getenv("MAIL_PASSWORD", "")
         self.MAIL_FROM = os.getenv("MAIL_FROM", "")

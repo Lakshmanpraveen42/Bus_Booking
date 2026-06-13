@@ -30,18 +30,24 @@ def handle_search(session, entities, db, message=None):
     data = session["data"]
     step = session.get("step")
     
-    source = entities.get("source") or data.get("source")
-    destination = entities.get("destination") or data.get("destination")
-    date = entities.get("date") or data.get("date")
+    # 🔒 SLOT PROTECTION: Prioritize already collected data
+    source = data.get("source") or entities.get("source")
+    destination = data.get("destination") or entities.get("destination")
+    date = data.get("date") or entities.get("date")
 
-    # Smart Slot Filling: Use step context to override NLU if it's ambiguous
-    if step == "ask_source" and (entities.get("source") or message):
-        source = entities.get("source") or message.strip()
-    if step == "ask_destination" and (entities.get("destination") or message):
-        # If NLU says it's a source but we asked for destination, it's a destination
+    # Smart Slot Filling: Strictly follow the bot's question step
+    if step == "ask_source" and (entities.get("source") or entities.get("destination") or message):
+        source = entities.get("source") or entities.get("destination") or message.strip()
+    
+    if step == "ask_destination" and (entities.get("destination") or entities.get("source") or message):
         destination = entities.get("destination") or entities.get("source") or message.strip()
+    
     if step == "ask_date" and (entities.get("date") or message):
         date = entities.get("date") or message.strip()
+
+
+
+
 
 
     if not source:
@@ -77,18 +83,25 @@ def handle_booking(session, entities, db, message=None):
     data = session["data"]
     step = session.get("step")
     
-    source = entities.get("source") or data.get("source")
-    destination = entities.get("destination") or data.get("destination")
-    date = entities.get("date") or data.get("date")
+    # 🔒 SLOT PROTECTION
+    source = data.get("source") or entities.get("source")
+    destination = data.get("destination") or entities.get("destination")
+    date = data.get("date") or entities.get("date")
 
-    # Smart Slot Filling
-    if step == "ask_source" and (entities.get("source") or message):
-        source = entities.get("source") or message.strip()
-    if step == "ask_destination" and (entities.get("destination") or message):
+    # Smart Slot Filling: Strictly follow the bot's question step
+    if step == "ask_source" and (entities.get("source") or entities.get("destination") or message):
+        source = entities.get("source") or entities.get("destination") or message.strip()
+    
+    if step == "ask_destination" and (entities.get("destination") or entities.get("source") or message):
         destination = entities.get("destination") or entities.get("source") or message.strip()
+    
     if step == "ask_date" and (entities.get("date") or message):
         date = entities.get("date") or message.strip()
 
+
+
+    if step == "ask_date" and (entities.get("date") or message):
+        date = entities.get("date") or message.strip()
 
     if not source:
         session["step"] = "ask_source"
@@ -130,10 +143,14 @@ def handle_booking(session, entities, db, message=None):
         selected_trip = next((t for t in trips if target in t['bus_name'].lower() or t['bus_name'].lower() in target), None)
 
     if selected_trip:
-        seat_url = os.getenv("SEAT_SELECTION_URL", "#")
+        t_id = selected_trip['trip_id']
+        base_url = os.getenv("SEAT_SELECTION_URL", "http://localhost:5173/seats")
+        seat_url = f"{base_url}/{t_id}"
+        
         session["step"] = None
         session["data"] = {}
-        return f"Selection confirmed: {selected_trip['bus_name']}. Click below to select seats.", [selected_trip]
+        return f"Selection confirmed: {selected_trip['bus_name']}. Click here to select your seats: {seat_url}/", [selected_trip]
+
 
     if step == "select_trip":
         return "I couldn't find that bus. Please provide a valid Bus Name or Trip ID.", trips
@@ -151,25 +168,56 @@ def handle_view(user_id, db):
     if not bookings:
         return "You have no active bookings at this time.", []
     
+    active = [b for b in bookings if b.status == "booked"]
+    past = [b for b in bookings if b.status != "booked"]
+    
+    response = "Here are your booking details:\n\n"
+    if active:
+        response += "📅 **Upcoming Trips:**\n"
+        for b in active:
+            response += f"- ID #{b.id}: {b.source} to {b.destination} ({b.bus_name})\n"
+    
+    if past:
+        response += "\n🕒 **Past/Cancelled Trips:**\n"
+        for b in past:
+            response += f"- ID #{b.id}: {b.source} to {b.destination} ({b.status.title()})\n"
+            
     raw_data = [{
         "booking_id": b.id, "bus_name": b.bus_name, "source": b.source,
-        "destination": b.destination, "status": b.status, "booking_time": str(b.booking_time)
+        "destination": b.destination, "status": b.status, "booking_time": b.booking_time.strftime("%Y-%m-%d %H:%M")
     } for b in bookings]
     
-    return "Here are your recent booking details.", raw_data
+    return response, raw_data
+
 
 
 def handle_cancellation(session, entities, user_id, db, message=None):
-    from services.booking_service import perform_cancellation
+    from services.booking_service import perform_cancellation, get_user_bookings_service
     data = session["data"]
     booking_id = entities.get("booking_id") or data.get("booking_id")
 
+    # If user provided a numeric ID in response to 'ask_booking_id'
     if not booking_id and message and message.strip().isdigit():
         booking_id = message.strip()
 
     if not booking_id:
+        # Fetch active bookings for this user
+        bookings = get_user_bookings_service(user_id, db)
+        # Filter for strictly "booked" status
+        active_bookings = [b for b in bookings if b.status == "booked"]
+        
+        if not active_bookings:
+            session["step"] = None
+            return "I couldn't find any active bookings to cancel. Is there anything else I can help you with?", []
+        
+        raw_data = [{
+            "booking_id": b.id, "bus_name": b.bus_name, "source": b.source,
+            "destination": b.destination, "booking_time": b.booking_time.strftime("%Y-%m-%d %H:%M")
+        } for b in active_bookings]
+
         session["step"] = "ask_booking_id"
-        return "Please provide the Booking ID you wish to cancel.", []
+        return "Which booking would you like to cancel? Here are your active trips:", raw_data
+
 
     data["booking_id"] = booking_id
     if not str(booking_id).strip().isdigit():

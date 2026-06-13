@@ -3,9 +3,11 @@ from db.database import SessionLocal
 import json
 
 def test_chat():
+    import time
     db = SessionLocal()
     user_id = 'SB_USER_6549'
-    sess_id = 'test_sess_date_fix'
+    sess_id = f'test_sess_{int(time.time())}'
+
     
     steps = [
         "i want to book a ticket",

@@ -3,11 +3,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from core.config import settings
 from datetime import datetime
+import logging
+
+logger = logging.getLogger("SmartBus")
 
 
 def send_email(to_email: str, subject: str, body: str, is_html: bool = False):
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        print(f"SMTP credentials missing. Would have sent to {to_email}: {subject}")
+        logger.warning(f"SMTP credentials missing. Would have sent to {to_email}: {subject}")
         return False
         
     try:
@@ -25,9 +28,10 @@ def send_email(to_email: str, subject: str, body: str, is_html: bool = False):
         server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
         server.send_message(msg)
         server.quit()
+        logger.info(f"Email sent successfully to {to_email} with subject: {subject}")
         return True
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        logger.error(f"Failed to send email to {to_email}: {e}", exc_info=True)
         return False
 
 def send_otp_email(to_email: str, otp: str):
