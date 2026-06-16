@@ -4,6 +4,8 @@ import { useChatStore } from '../../store/useChatStore';
 import { CHAT_SENDER } from '../../utils/constants';
 import { formatTime12h } from '../../utils/formatters';
 
+import ChatMessageRenderer from './ChatMessageRenderer';
+
 /** Typing indicator dots */
 const TypingIndicator = () => (
   <div className="flex items-center gap-1 px-4 py-2.5 bg-slate-100 rounded-2xl rounded-tl-sm w-fit">
@@ -31,16 +33,16 @@ const ChatBubble = ({ message }) => {
           <Bot className="w-4 h-4 text-primary-600" />
         </div>
       )}
-      <div className={['max-w-[80%]', isBot ? '' : 'flex flex-col items-end'].join(' ')}>
+      <div className={['max-w-[85%]', isBot ? '' : 'flex flex-col items-end'].join(' ')}>
         <div
           className={[
-            'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-line',
+            'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed',
             isBot
-              ? 'bg-slate-100 text-slate-800 rounded-tl-sm'
-              : 'bg-primary-500 text-white rounded-tr-sm',
+              ? 'bg-slate-100 text-slate-800 rounded-tl-sm shadow-sm'
+              : 'bg-primary-500 text-white rounded-tr-sm shadow-md',
           ].join(' ')}
         >
-          {message.text}
+          <ChatMessageRenderer message={message} />
         </div>
         <p className="text-[10px] text-slate-400 mt-0.5 px-1">{time}</p>
       </div>
@@ -144,11 +146,14 @@ const ChatWidget = () => {
               </div>
             ))}
             {isTyping && (
-              <div className="flex gap-2 mb-3">
-                <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-primary-600" />
+              <div className="flex flex-col gap-1 mb-4">
+                <div className="flex gap-2">
+                  <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-4 h-4 text-primary-600" />
+                  </div>
+                  <TypingIndicator />
                 </div>
-                <TypingIndicator />
+                <p className="text-[10px] text-slate-400 ml-9 font-medium animate-pulse">SmartBus is checking details...</p>
               </div>
             )}
             <div ref={messagesEndRef} />

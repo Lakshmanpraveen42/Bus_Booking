@@ -33,7 +33,7 @@ const classifyMessage = (message) => {
  *   return { text: res.choices[0].message.content }
  */
 export const chatService = {
-  async sendMessage(userMessage, history = []) {
+  async sendMessage(userMessage, userId, sessionId, history = []) {
     if (USE_MOCK) {
       await delay(TYPING_DELAY);
       const key = classifyMessage(userMessage);
@@ -41,21 +41,31 @@ export const chatService = {
       return { text, quickReplies: key === 'default' ? chatData.quickReplies : [] };
     }
 
-    // ─── Real API (Groq AI with Memory) ───
+    // ─── Real API (FastAPI Chatbot) ───
     const res = await fetch(`${API_BASE_URL}/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+      },
       body: JSON.stringify({ 
+        user_id: userId || "SB_GUEST",
+        session_id: (sessionId && sessionId.trim() !== "") ? sessionId : "",
         message: userMessage,
-        history: history.map(m => ({
-          role: m.sender === 'user' ? 'user' : 'assistant',
-          content: m.text
-        }))
+        timestamp: new Date().toISOString()
       }),
     });
     if (!res.ok) throw new Error('Chat service unavailable');
     const json = await res.json();
-    return { text: json.reply ?? json.text, quickReplies: json.quickReplies ?? [] };
+    
+    // Return standard format: { text: string, quickReplies: [] }
+    // Handles case where backend returns { response: "..." } or { reply: "..." }
+    return { 
+      text: json.message || json.response || json.reply || json.text || "I'm sorry, I couldn't process that.", 
+      quickReplies: json.quickReplies ?? [],
+      intent: json.intent,
+      data: json.data || []
+    };
   },
 
   getQuickReplies() {

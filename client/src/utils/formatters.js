@@ -3,8 +3,14 @@ import { format, parseISO } from 'date-fns';
 /**
  * Format price in INR with ₹ symbol and comma separators.
  */
-export const formatPrice = (amount) =>
-  new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
+export const formatPrice = (amount) => {
+  if (amount === null || amount === undefined || isNaN(Number(amount))) return '--';
+  return new Intl.NumberFormat('en-IN', { 
+    style: 'currency', 
+    currency: 'INR', 
+    maximumFractionDigits: 0 
+  }).format(amount);
+};
 
 /**
  * Convert total minutes to human-readable duration, e.g. "8h 30m".

@@ -21,6 +21,15 @@ export const buildQRPayload = ({ bookingId, from, to, date, seats }) => {
 export const generateMsgId = () => `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 /**
+ * Generate a unique session ID for chat sessions.
+ */
+export const generateSessionId = () => {
+  const chars = Math.random().toString(36).slice(2, 5).toUpperCase();
+  const suffix = Date.now().toString().slice(-3);
+  return `CONV_${chars}_${suffix}`;
+};
+
+/**
  * Simulate an async delay (for mock service realism).
  */
 export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

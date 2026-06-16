@@ -15,6 +15,8 @@ export const useAdminStore = create(
       locations: [],
 
       setLocations: (data) => set({ locations: data }),
+      setBuses: (data) => set({ buses: data }),
+      setTrips: (data) => set({ trips: data }),
 
       // --- Route Operations: Network Integrity ---
       addRoute: (route) => {
@@ -87,7 +89,7 @@ export const useAdminStore = create(
         }
 
         set((state) => ({ 
-          buses: [...state.buses, { ...bus, id: Date.now() }] 
+          buses: [...state.buses, { ...bus, id: bus.id || Date.now() }] 
         }));
         toast.success("Vehicle added to fleet");
         return true;
@@ -156,7 +158,7 @@ export const useAdminStore = create(
 
         const newTrip = {
           ...trip,
-          id: Date.now(),
+          id: trip.id || Date.now(),
           source: route.source,
           destination: route.destination,
           bus: { 

@@ -133,6 +133,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/ticket/:bookingId" element={<BookingConfirmation />} />
         <Route path="/cancel-booking/:bookingId" element={<CancellationPage />} />
         <Route path="/profile" element={<Profile />} />
 

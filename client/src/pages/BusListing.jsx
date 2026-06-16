@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
+
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeftRight, Search, SlidersHorizontal, 
   MapPin, Calendar, ChevronDown, RotateCw
 } from 'lucide-react';
 import PageWrapper from '../components/layout/PageWrapper';
+import SearchHeader from '../components/bus/SearchHeader';
 import BusCard from '../components/bus/BusCard';
 import EmptyState from '../components/bus/EmptyState';
 import { busService } from '../services/busService';
@@ -19,11 +25,81 @@ const BusListing = () => {
   const [buses, setBuses] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const [source, setSource] = useState(searchParams.get('source') || '');
-  const [destination, setDestination] = useState(searchParams.get('destination') || '');
-  const [date, setDate] = useState(searchParams.get('date') || '');
+  // States for filters (searchParams are now the source of truth for the header)
+  const source = searchParams.get('source') || '';
+  const destination = searchParams.get('destination') || '';
+  const date = searchParams.get('date') || '';
+
+  // Filter & Sort State
+  const [filters, setFilters] = useState({
+    departureSlots: [], // labels: Morning, Afternoon, Evening, Night
+    busTypes: [],
+    priceRange: [0, 5000]
+  });
+  const [sortBy, setSortBy] = useState('Price - Low to High');
 
   const setSelectedBus = useBookingStore((s) => s.setSelectedBus);
+
+  const filteredBuses = useMemo(() => {
+    let result = [...buses];
+
+    // 1. Filter by Departure Time
+    if (filters.departureSlots.length > 0) {
+      result = result.filter(bus => {
+        const hour = dayjs(bus.departureTime, "hh:mm A").hour();
+        return filters.departureSlots.some(slot => {
+          if (slot === 'Morning (12 AM - 12 PM)') return hour >= 0 && hour < 12;
+          if (slot === 'Afternoon (12 PM - 4 PM)') return hour >= 12 && hour < 16;
+          if (slot === 'Evening (4 PM - 8 PM)') return hour >= 16 && hour < 20;
+          if (slot === 'Night (8 PM - 12 AM)') return hour >= 20 && hour < 24;
+          return false;
+        });
+      });
+    }
+
+    // 2. Filter by Bus Type
+    if (filters.busTypes.length > 0) {
+      result = result.filter(bus => 
+        filters.busTypes.some(type => bus.busType.toLowerCase().includes(type.toLowerCase()))
+      );
+    }
+
+    // 3. Filter by Price
+    result = result.filter(bus => bus.price <= filters.priceRange[1]);
+
+    // 4. Sorting
+    result.sort((a, b) => {
+      if (sortBy === 'Price - Low to High') return a.price - b.price;
+      if (sortBy === 'Departure Time') {
+        const timeA = dayjs(a.departureTime, "hh:mm A");
+        const timeB = dayjs(b.departureTime, "hh:mm A");
+        return timeA.isBefore(timeB) ? -1 : 1;
+      }
+      if (sortBy === 'Rating') return 4.8 - 4.8; // Hardcoded rating logic for now
+      return 0;
+    });
+
+    return result;
+  }, [buses, filters, sortBy]);
+
+  const toggleFilter = (category, value) => {
+    setFilters(prev => {
+      const current = prev[category];
+      const next = current.includes(value)
+        ? current.filter(v => v !== value)
+        : [...current, value];
+      return { ...prev, [category]: next };
+    });
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      departureSlots: [],
+      busTypes: [],
+      priceRange: [0, 5000]
+    });
+    setSortBy('Price - Low to High');
+  };
 
   useEffect(() => {
     const fetchBuses = async () => {
@@ -47,52 +123,8 @@ const BusListing = () => {
   return (
     <PageWrapper className="bg-slate-50 min-h-screen pt-[76px]">
       
-      {/* 🔴 REFERENCE-MATCHED SEARCH BAR */}
-      <div className="bg-white border-b border-slate-100 py-4 shadow-sm sticky top-[76px] z-40">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-4">
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-0 items-center border border-slate-200 rounded-lg overflow-hidden">
-             
-             {/* From */}
-             <div className="md:col-span-4 flex items-center gap-3 px-4 py-3 bg-white border-r border-slate-200">
-                <MapPin className="w-5 h-5 text-emerald-500" />
-                <div>
-                   <input value={source} onChange={(e) => setSource(e.target.value)} className="w-full text-sm font-bold bg-transparent outline-none placeholder:text-slate-300" placeholder="Anantapur" />
-                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">APT</p>
-                </div>
-             </div>
-
-             {/* Swap */}
-             <button className="hidden md:flex absolute left-[32.6%] -translate-x-1/2 bg-white border border-slate-200 rounded-full w-8 h-8 items-center justify-center text-slate-400 hover:text-primary-500 z-10">
-                <ArrowLeftRight className="w-4 h-4" />
-             </button>
-
-             {/* To */}
-             <div className="md:col-span-4 flex items-center gap-3 px-8 py-3 bg-white border-r border-slate-200">
-                <MapPin className="w-5 h-5 text-rose-500" />
-                <div>
-                   <input value={destination} onChange={(e) => setDestination(e.target.value)} className="w-full text-sm font-bold bg-transparent outline-none placeholder:text-slate-300" placeholder="Guntur" />
-                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">GNT</p>
-                </div>
-             </div>
-
-             {/* Date */}
-             <div className="md:col-span-4 flex items-center gap-3 px-4 py-3 bg-white">
-                <Calendar className="w-5 h-5 text-slate-400" />
-                <div>
-                   <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full text-sm font-bold bg-transparent outline-none" />
-                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">Monday</p>
-                </div>
-             </div>
-          </div>
-
-          <button 
-            onClick={() => setSearchParams({ source, destination, date })}
-            className="w-full md:w-auto h-14 px-8 bg-[#e32e33] text-white rounded-lg font-bold text-sm transition-all hover:bg-[#c1272c]"
-          >
-            Modify Search
-          </button>
-        </div>
-      </div>
+      {/* 🔴 SEARCH HEADER */}
+      <SearchHeader />
 
       <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
@@ -101,21 +133,51 @@ const BusListing = () => {
           <div className="bg-white rounded-xl border border-slate-100 p-6 shadow-sm">
              <div className="flex items-center justify-between mb-8">
                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Filters</h3>
-                <button className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Reset</button>
+                <button 
+                  onClick={resetFilters}
+                  className="text-[10px] font-bold text-rose-500 uppercase tracking-widest hover:underline"
+                >
+                  Reset
+                </button>
              </div>
 
              <FilterSection title="Departure Time">
-                <FilterOption label="Morning (12 AM - 12 PM)" count="120" />
-                <FilterOption label="Afternoon (12 PM - 4 PM)" count="85" />
-                <FilterOption label="Evening (4 PM - 8 PM)" count="64" checked />
-                <FilterOption label="Night (8 PM - 12 AM)" count="91" />
+                <FilterOption 
+                  label="Morning (12 AM - 12 PM)" 
+                  count={buses.filter(b => {const h = dayjs(b.departureTime, "hh:mm A").hour(); return h >= 0 && h < 12}).length} 
+                  checked={filters.departureSlots.includes("Morning (12 AM - 12 PM)")}
+                  onClick={() => toggleFilter('departureSlots', "Morning (12 AM - 12 PM)")}
+                />
+                <FilterOption 
+                  label="Afternoon (12 PM - 4 PM)" 
+                  count={buses.filter(b => {const h = dayjs(b.departureTime, "hh:mm A").hour(); return h >= 12 && h < 16}).length} 
+                  checked={filters.departureSlots.includes("Afternoon (12 PM - 4 PM)")}
+                  onClick={() => toggleFilter('departureSlots', "Afternoon (12 PM - 4 PM)")}
+                />
+                <FilterOption 
+                  label="Evening (4 PM - 8 PM)" 
+                  count={buses.filter(b => {const h = dayjs(b.departureTime, "hh:mm A").hour(); return h >= 16 && h < 20}).length} 
+                  checked={filters.departureSlots.includes("Evening (4 PM - 8 PM)")}
+                  onClick={() => toggleFilter('departureSlots', "Evening (4 PM - 8 PM)")}
+                />
+                <FilterOption 
+                  label="Night (8 PM - 12 AM)" 
+                  count={buses.filter(b => {const h = dayjs(b.departureTime, "hh:mm A").hour(); return h >= 20 && h < 24}).length} 
+                  checked={filters.departureSlots.includes("Night (8 PM - 12 AM)")}
+                  onClick={() => toggleFilter('departureSlots', "Night (8 PM - 12 AM)")}
+                />
              </FilterSection>
 
              <FilterSection title="Bus Type">
-                <FilterOption label="AC Seater" count="112" />
-                <FilterOption label="AC Sleeper" count="98" />
-                <FilterOption label="Non AC Seater" count="34" />
-                <FilterOption label="Non AC Sleeper" count="16" />
+                {['AC Seater', 'AC Sleeper', 'Non AC Seater', 'Non AC Sleeper'].map(type => (
+                  <FilterOption 
+                    key={type}
+                    label={type} 
+                    count={buses.filter(b => b.busType.toLowerCase().includes(type.toLowerCase().split(' ').join(''))).length} 
+                    checked={filters.busTypes.includes(type)}
+                    onClick={() => toggleFilter('busTypes', type)}
+                  />
+                ))}
              </FilterSection>
 
              <FilterSection title="Amenities">
@@ -127,15 +189,24 @@ const BusListing = () => {
              </FilterSection>
 
              <div className="mt-8 pt-8 border-t border-slate-50">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Price Range</h4>
-                <div className="h-1.5 w-full bg-slate-100 rounded-full relative">
-                   <div className="absolute left-0 right-0 h-full bg-rose-500 rounded-full" />
-                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-rose-500 rounded-full shadow-sm" />
-                   <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-rose-500 rounded-full shadow-sm" />
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex justify-between">
+                  Price Range
+                  <span className="text-rose-500">Up to ₹{filters.priceRange[1]}</span>
+                </h4>
+                <div className="px-2">
+                  <input 
+                    type="range" 
+                    min="200" 
+                    max="5000" 
+                    step="100"
+                    value={filters.priceRange[1]}
+                    onChange={(e) => setFilters(prev => ({ ...prev, priceRange: [0, parseInt(e.target.value)] }))}
+                    className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-rose-500"
+                  />
                 </div>
                 <div className="flex items-center justify-between mt-4">
-                   <span className="text-[10px] font-bold text-slate-500">₹300</span>
-                   <span className="text-[10px] font-bold text-slate-500">₹2000+</span>
+                   <span className="text-[10px] font-bold text-slate-500">₹200</span>
+                   <span className="text-[10px] font-bold text-slate-500">₹5000</span>
                 </div>
              </div>
           </div>
@@ -144,10 +215,14 @@ const BusListing = () => {
         {/* 🔵 LISTING AREA */}
         <div className="lg:col-span-9">
           <div className="flex items-center justify-between mb-6">
-             <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{buses.length} BUSES FOUND</h2>
+             <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{filteredBuses.length} BUSES FOUND</h2>
              <div className="flex items-center gap-4">
                 <span className="text-[11px] font-bold text-slate-400">Sort by:</span>
-                <select className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-[11px] font-bold text-slate-600 outline-none">
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-[11px] font-bold text-slate-600 outline-none cursor-pointer"
+                >
                    <option>Price - Low to High</option>
                    <option>Departure Time</option>
                    <option>Rating</option>
@@ -158,8 +233,8 @@ const BusListing = () => {
           <div className="space-y-4">
             {loading ? (
               [...Array(4)].map((_, i) => <BusCardSkeleton key={i} />)
-            ) : buses.length > 0 ? (
-              buses.map((bus) => (
+            ) : filteredBuses.length > 0 ? (
+              filteredBuses.map((bus) => (
                 <BusCard key={bus.id} bus={bus} onSelect={async () => {
                    setSelectedBus(bus);
                    navigate(`/seats/${bus.id}`);
@@ -183,8 +258,8 @@ const FilterSection = ({ title, children }) => (
   </div>
 );
 
-const FilterOption = ({ label, count, checked }) => (
-  <div className="flex items-center justify-between group cursor-pointer">
+const FilterOption = ({ label, count, checked, onClick }) => (
+  <div className="flex items-center justify-between group cursor-pointer" onClick={onClick}>
     <div className="flex items-center gap-3">
        <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${checked ? 'bg-rose-500 border-rose-500' : 'bg-white border-slate-200 group-hover:border-rose-300'}`}>
           {checked && <div className="w-1.5 h-1.5 bg-white rounded-full" />}

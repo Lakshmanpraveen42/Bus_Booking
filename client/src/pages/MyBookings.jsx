@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import PageWrapper from '../components/layout/PageWrapper';
 import Badge from '../components/ui/Badge';
 import { Ticket, Calendar, Clock, MapPin, ChevronRight, Download, XCircle, Bus, Loader2, LogIn } from 'lucide-react';
@@ -85,7 +85,16 @@ const MyBookings = () => {
 
 const BookingItem = ({ booking }) => {
   // Aggregate seat numbers from passengers
-  const seatNumbers = booking.passengers?.map(p => p.seat_number).join(', ') || 'N/A';
+  let passengers = booking.passengers;
+  if (typeof passengers === 'string') {
+    try {
+      passengers = JSON.parse(passengers);
+    } catch (e) {
+      console.error("Failed to parse passengers", e);
+      passengers = [];
+    }
+  }
+  const seatNumbers = (passengers || []).map(p => p.seat_number).join(', ') || 'N/A';
   
   return (
     <div className="bg-white rounded-[40px] p-8 shadow-2xl shadow-slate-200/50 border border-slate-100 group transition-all duration-500 overflow-hidden relative">
@@ -96,39 +105,60 @@ const BookingItem = ({ booking }) => {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-6">
-            <div>
+            <Link to={`/ticket/${booking.booking_id}`} className="hover:opacity-80 transition-opacity">
               <h3 className="text-xl font-black text-slate-900 mb-1">{booking.bus_name}</h3>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Reference: #SB_BK_{booking.booking_id}</p>
-            </div>
-            <div className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border ${booking.status === 'booked' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
-               {booking.status === 'booked' ? 'Confirmed' : 'Cancelled'}
+            </Link>
+            <div className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border ${
+              (booking.status || '').toLowerCase() === 'booked' 
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                : (booking.status || '').toLowerCase() === 'cancelled'
+                ? 'bg-rose-50 text-rose-600 border-rose-100'
+                : 'bg-amber-50 text-amber-600 border-amber-100'
+            }`}>
+               {booking.status === 'booked' ? 'CONFIRMED' : (booking.status || 'PENDING').toUpperCase()}
             </div>
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <InfoCol icon={<MapPin className="w-3 h-3" />} label="Route" value={`${booking.source} → ${booking.destination}`} />
-            <InfoCol icon={<Calendar className="w-3 h-3" />} label="Booking Date" value={booking.booking_time.split(' ')[0]} />
-            <InfoCol icon={<Clock className="w-3 h-3" />} label="Booking Time" value={booking.booking_time.split(' ')[1]} />
+            <InfoCol icon={<MapPin className="w-3 h-3" />} label="Route" value={`${booking.source || 'N/A'} → ${booking.destination || 'N/A'}`} />
+            <InfoCol icon={<Calendar className="w-3 h-3" />} label="Booking Date" value={(booking.booking_time || '').split(' ')[0] || (booking.booking_time || '').split('T')[0] || 'N/A'} />
+            <InfoCol icon={<Clock className="w-3 h-3" />} label="Booking Time" value={(booking.booking_time || '').split(' ')[1] || (booking.booking_time || '').split('T')[1]?.split('.')[0] || 'N/A'} />
             <InfoCol icon={<Ticket className="w-3 h-3" />} label="Seats" value={seatNumbers} />
           </div>
         </div>
       </div>
 
-      <div className="mt-8 pt-8 border-t border-slate-50 flex items-center justify-between">
+      <div className="mt-8 pt-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-8">
          <div className="text-2xl font-black text-slate-900">
             <span className="text-xs font-bold text-slate-400 mr-2 italic">Paid:</span>{formatPrice(booking.total_amount)}
          </div>
          <div className="flex gap-4">
-            <button className="flex items-center gap-2 px-6 py-3 bg-slate-50 hover:bg-slate-100 rounded-2xl text-xs font-black text-slate-600 transition-all">
-               <Download className="w-4 h-4" /> Ticket
-            </button>
-            {booking.status === 'booked' && (
-              <a 
-                href={`/cancel-booking/${booking.booking_id}`}
+            <Link 
+              to={`/ticket/${booking.booking_id}`}
+              className="flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 rounded-2xl text-xs font-black text-white transition-all shadow-lg shadow-primary-500/20"
+            >
+               View Ticket
+            </Link>
+            {((booking.status || '').toUpperCase() === 'CANCELLED' || (booking.status || '').toUpperCase() === 'CANCELED') ? (
+               <button disabled className="flex items-center gap-2 px-6 py-3 bg-slate-50 rounded-2xl text-xs font-black text-slate-300 cursor-not-allowed">
+                  <Download className="w-4 h-4" /> Download
+               </button>
+            ) : (
+               <button 
+                 onClick={() => bookingService.downloadTicket(booking.booking_id)}
+                 className="flex items-center gap-2 px-6 py-3 bg-slate-50 hover:bg-slate-100 rounded-2xl text-xs font-black text-slate-600 transition-all"
+               >
+                  <Download className="w-4 h-4" /> Download
+               </button>
+            )}
+            {(booking.status || '').toLowerCase() === 'booked' && (
+              <Link 
+                to={`/cancel-booking/${booking.booking_id}`}
                 className="flex items-center gap-2 px-6 py-3 bg-white text-red-500 border border-red-50 rounded-2xl text-xs font-black hover:bg-red-50 transition-all shadow-sm"
               >
                  <XCircle className="w-4 h-4" /> Cancel Trip
-              </a>
+              </Link>
             )}
          </div>
       </div>

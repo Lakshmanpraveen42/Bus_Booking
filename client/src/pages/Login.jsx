@@ -3,36 +3,90 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import PageWrapper from '../components/layout/PageWrapper';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { Mail, Lock, LogIn, Github, Chrome, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
+import api from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
+import { generateSessionId } from '../utils/generators';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, adminLogin, loading, error } = useAuthStore();
-  const [isAdmin, setIsAdmin] = useState(false);
   
+  // States
+  const [isAdmin, setIsAdmin] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    email: location.state?.email || '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-
+  const [successMessage, setSuccessMessage] = useState(location.state?.message || null);
+  
+  // Local UI State
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError(""); // Clear error on input
   };
 
-  const handleSubmit = async (e) => {
+  /**
+   * handleLogin: Refined authentication logic
+   * Correctly validates backend response shape and updates UI state.
+   */
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const success = isAdmin 
-      ? await adminLogin(formData.email, formData.password)
-      : await login(formData.email, formData.password);
+    
+    // 1. Input Validation
+    if (!formData.email.trim() || !formData.password.trim()) {
+      setError("Email and password are required");
+      return;
+    }
 
-    if (success) {
-      const user = useAuthStore.getState().user;
-      const from = location.state?.from || (user?.is_admin ? '/admin' : '/');
-      navigate(from, { replace: true });
+    setLoading(true);
+    setError("");
+
+    try {
+      const endpoint = isAdmin ? '/admin/login' : '/login';
+      const response = await api.post(endpoint, {
+        email: formData.email,
+        password: formData.password
+      });
+
+      // 5. Add Debugging (IMPORTANT)
+      console.log("Login Response:", response.data);
+
+      const data = response.data;
+
+      // 3. Only Login on Success
+      if (data.user) {
+        const sessionId = generateSessionId();
+        
+        // Update Global Auth State (Persistence handled by Zustand middleware)
+        useAuthStore.setState({
+          token: data.access_token || null,
+          user: data.user,
+          isAuthenticated: true,
+          sessionId,
+          loading: false,
+          error: null
+        });
+
+        // 3. Navigation logic
+        const from = location.state?.from || (data.user.is_admin ? '/admin' : '/');
+        navigate(from, { replace: true });
+      } else {
+        // Block Login on Error
+        setError(data?.error || data?.detail || "Invalid email or password");
+      }
+
+    } catch (err) {
+      // 9. Handle network errors or non-2xx responses
+      console.error("Login Error:", err);
+      const apiError = err.response?.data?.detail || err.response?.data?.error || "Invalid email or password";
+      setError(apiError);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,14 +109,21 @@ const Login = () => {
             </p>
           </div>
 
+          {/* 6. UI Error Handling */}
           {error && (
             <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-500 text-sm font-bold animate-shake">
               {error}
             </div>
           )}
 
+          {successMessage && (
+            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-emerald-600 text-sm font-bold">
+              {successMessage}
+            </div>
+          )}
+
           {/* Form */}
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleLogin}>
             <Input 
               label={isAdmin ? "Staff Email" : "Email Address"} 
               name="email"
@@ -72,6 +133,7 @@ const Login = () => {
               onChange={handleChange}
               leftIcon={<Mail className="w-4 h-4" />}
               required
+              disabled={loading}
             />
             <div className="space-y-1">
               <Input 
@@ -92,6 +154,7 @@ const Login = () => {
                   </button>
                 }
                 required
+                disabled={loading}
               />
               {!isAdmin && (
                 <div className="text-right">
@@ -108,9 +171,10 @@ const Login = () => {
               type="submit" 
               shadow 
               loading={loading}
+              disabled={loading} // 7. Loading State: Disable button
               className={isAdmin ? 'bg-slate-900 hover:bg-black' : ''}
             >
-              {loading ? 'Authenticating...' : (isAdmin ? 'Access Portal' : 'Sign In')}
+              {loading ? 'Logging in...' : (isAdmin ? 'Access Portal' : 'Sign In')}
             </Button>
           </form>
 

@@ -2,17 +2,20 @@ import { create } from 'zustand';
 import { CHAT_SENDER } from '../utils/constants';
 import { chatService } from '../services/chatService';
 import { generateMsgId } from '../utils/generators';
+import { useAuthStore } from './useAuthStore';
 
-const makeMessage = (text, sender, quickReplies = []) => ({
+const makeMessage = (text, sender, quickReplies = [], metadata = {}) => ({
   id: generateMsgId(),
   text,
   sender,
   quickReplies,
+  type: metadata.type || 'text',
+  data: metadata.data || null,
   timestamp: new Date(),
 });
 
 const INITIAL_BOT_MSG = makeMessage(
-  "Hi! 👋 I'm your BusGo travel assistant. How can I help you today?",
+  "Hi! 👋 I'm your SmartBus travel assistant. How can I help you today?",
   CHAT_SENDER.BOT,
   chatService.getQuickReplies()
 );
@@ -40,8 +43,36 @@ export const useChatStore = create((set, get) => ({
 
     try {
       const { messages } = get();
-      const { text: replyText, quickReplies } = await chatService.sendMessage(text, messages);
-      const botMsg = makeMessage(replyText, CHAT_SENDER.BOT, quickReplies ?? []);
+      const auth = useAuthStore.getState();
+      const userId = auth.user?.id || auth.user?._id || "SB_GUEST";
+      const sessionId = auth.sessionId;
+
+      const response = await chatService.sendMessage(
+        text, 
+        userId, 
+        sessionId, 
+        messages
+      );
+
+      // 8. Debugging (IMPORTANT)
+      console.log("Chat Response:", response);
+
+      // Determine message type based on intent
+      let msgType = 'text';
+      if (response.intent === 'view_bookings') {
+        msgType = 'bookings';
+      } else if (response.intent === 'cancel_ticket') {
+        msgType = 'booking_selection';
+      } else if (response.intent === 'book_ticket') {
+        msgType = 'bus_list';
+      }
+
+      const botMsg = makeMessage(
+        response.text, 
+        CHAT_SENDER.BOT, 
+        response.quickReplies,
+        { type: msgType, data: response.data }
+      );
 
       set((state) => ({
         messages: [...state.messages, botMsg],

@@ -221,42 +221,42 @@ const SeatSelection = () => {
 
           {/* ITINERARY DASHBOARD PANEL */}
           <div className="lg:col-span-4 lg:sticky lg:top-10 space-y-6">
-            <div className="bg-slate-900 rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden">
-               <div className="absolute -top-10 -right-10 opacity-5 scale-150 rotate-12"><Check className="w-32 h-32" /></div>
+            <div className="bg-white rounded-[3rem] p-8 lg:p-10 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] relative overflow-hidden">
+               <div className="absolute -top-10 -right-10 opacity-[0.03] scale-150 rotate-12"><Check className="w-32 h-32 text-slate-900" /></div>
                
-               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-400 mb-10 pb-4 border-b border-white/5">Order Dashboard</h3>
+               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 pb-4 border-b border-slate-100">Order Dashboard</h3>
 
                <div className="space-y-8">
                  {/* Bus Details Summary */}
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                       <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Timings</p>
-                       <p className="text-xs font-bold text-white/80">{selectedBus?.departureTime} - {selectedBus?.arrivalTime}</p>
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Timings</p>
+                       <p className="text-sm font-bold text-slate-800">{selectedBus?.departureTime} - {selectedBus?.arrivalTime}</p>
                     </div>
                     <div className="space-y-1 text-right">
-                       <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Duration</p>
-                       <div className="flex items-center justify-end gap-1.5 text-xs font-bold text-white/80">
-                         <Clock className="w-3 h-3 text-primary-400" /> {selectedBus?.duration || '--'}
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Duration</p>
+                       <div className="flex items-center justify-end gap-1.5 text-sm font-bold text-slate-800">
+                         <Clock className="w-3.5 h-3.5 text-primary-500" /> {selectedBus?.duration || '--'}
                        </div>
                     </div>
                  </div>
 
-                 <div className="space-y-6">
+                 <div className="space-y-4">
                     <div>
-                       <label className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-4">Confirmed Seats</label>
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Confirmed Seats</label>
                        <div className="flex flex-wrap gap-2.5">
                          {selectedSeats.length > 0 ? selectedSeats.map(s => (
-                           <div key={s.trip_seat_id} className="px-5 py-2.5 bg-primary-500 rounded-2xl text-xs font-black shadow-lg shadow-primary-500/20 text-white animate-scale-in">{s.seat_number}</div>
-                         )) : <p className="text-white/20 text-[11px] italic font-bold">Waiting for selection...</p>}
+                           <div key={s.trip_seat_id} className="px-5 py-2.5 bg-primary-50 text-primary-600 border border-primary-100 rounded-2xl text-xs font-black animate-scale-in">{s.seat_number}</div>
+                         )) : <p className="text-slate-400 text-[11px] italic font-bold">Waiting for selection...</p>}
                        </div>
                     </div>
                  </div>
 
-                 <div className="pt-8 border-t border-white/10">
+                 <div className="pt-8 border-t border-slate-100/80">
                     <div className="flex items-end justify-between transition-all duration-500">
                       <div>
-                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Payable Total</span>
-                        <p className="text-5xl font-black leading-none tracking-tighter mt-1 text-white">{formatPrice(totalPrice)}</p>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Payable Total</span>
+                        <p className="text-4xl lg:text-5xl font-black leading-none tracking-tighter mt-1 text-slate-900">{formatPrice(totalPrice)}</p>
                       </div>
                     </div>
                  </div>
@@ -265,12 +265,16 @@ const SeatSelection = () => {
                     <button
                       onClick={handleContinue}
                       disabled={!canConfirm}
-                      className="w-full h-18 bg-white text-slate-900 disabled:bg-white/5 disabled:text-white/10 rounded-[1.5rem] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95 group shadow-2xl"
+                      className={`w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-[0.98] group ${
+                        canConfirm 
+                          ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25 hover:bg-primary-600' 
+                          : 'bg-slate-50 text-slate-400 cursor-not-allowed'
+                      }`}
                     >
-                      Continue Checkout <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      Continue Checkout <ChevronRight className={`w-5 h-5 transition-transform ${canConfirm ? 'group-hover:translate-x-1' : ''}`} />
                     </button>
                     {!canConfirm && (
-                      <p className="text-[10px] text-center font-black text-white/20 uppercase tracking-[0.3em] animate-pulse italic">
+                      <p className="text-[10px] text-center font-black text-slate-400 uppercase tracking-[0.3em] animate-pulse italic">
                          Select journey & seat to confirm
                       </p>
                     )}

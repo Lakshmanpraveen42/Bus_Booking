@@ -88,8 +88,9 @@ const Checkout = () => {
     setLoading(true);
     try {
       const payload = {
-        user_id: user.id || "SB_USER_6549",
-        email: user.email,
+        user_id: user.id,
+        email: contact.email, // Backend expects 'email' field for ticket delivery
+        contact_phone: contact.phone,
         source: boardingPoint,
         destination: droppingPoint,
         price: parseFloat(grandTotal),
@@ -111,7 +112,8 @@ const Checkout = () => {
         // 1. Synchronize store state to unlock guards
         setBookingData({
           bookingId: response.data.booking_id,
-          bookingStatus: BOOKING_STATUS.SUCCESS
+          bookingStatus: BOOKING_STATUS.SUCCESS,
+          bookingData: response.data
         });
 
         toast.success(response.data.message || "Ticket confirmed successfully!");
@@ -178,7 +180,7 @@ const Checkout = () => {
                     icon={<Phone className="w-4 h-4" />}
                   />
                   <Input 
-                    label="Email Address" 
+                    label="Contact Email (Ticket will be sent here)" 
                     placeholder="name@example.com" 
                     value={contact.email}
                     error={submitted && errors.contact.email}

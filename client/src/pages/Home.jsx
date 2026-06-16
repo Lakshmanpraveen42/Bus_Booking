@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Calendar, ArrowLeftRight, Search, ChevronRight, ShieldCheck, Zap, Headphones, CreditCard, Bus } from 'lucide-react';
-import { format, addDays } from 'date-fns';
+import { format, addDays, parseISO, isValid, startOfToday } from 'date-fns';
+import CustomDatePicker from '../components/ui/CustomDatePicker';
 import PageWrapper from '../components/layout/PageWrapper';
 import Button from '../components/ui/Button';
 import { useBookingStore } from '../store/useBookingStore';
@@ -207,13 +208,10 @@ const Home = () => {
                     Departure Date
                   </label>
                   <div className="relative group">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary-500 transition-colors pointer-events-none" />
-                    <input
-                      type="date"
-                      value={date}
-                      min={MIN_DATE}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 rounded-2xl text-foreground text-sm md:text-base font-bold bg-surface border-2 border-transparent focus:border-primary focus:bg-card focus:outline-none transition-all shadow-sm"
+                    <CustomDatePicker
+                      selectedDate={date ? parseISO(date) : null}
+                      onChange={(d) => setDate(d ? format(d, 'yyyy-MM-dd') : '')}
+                      minDate={startOfToday()}
                     />
                   </div>
                 </div>

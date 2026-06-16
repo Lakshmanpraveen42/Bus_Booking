@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import SearchableSelect from '../../shared/SearchableSelect';
 import Input from '../../../ui/Input';
 import Button from '../../../ui/Button';
-import { Calendar, Clock, Banknote, ShieldAlert } from 'lucide-react';
+import { Calendar, Clock, Banknote, ShieldAlert, MapPin, Navigation } from 'lucide-react';
 
 /**
- * TripForm - Used to schedule an instance of a Route.
- * Prevents manual data entry by selecting from existing Routes and Buses.
+ * TripForm - Manual entry version for Source, Destination and Routing Points.
  */
-const TripForm = ({ routes = [], buses = [], initialData, onSave, onCancel, isEditing }) => {
+const TripForm = ({ buses = [], initialData, onSave, onCancel, isEditing }) => {
   const [formData, setFormData] = useState(initialData || {
-    route_id: '',
+    source: '',
+    destination: '',
+    routing_points: '',
     bus_id: '',
     departure_time: '',
     arrival_time: '',
@@ -20,7 +21,8 @@ const TripForm = ({ routes = [], buses = [], initialData, onSave, onCancel, isEd
 
   const validate = (data = formData) => {
     const newErrors = {};
-    if (!data.route_id) newErrors.route_id = 'Route is required';
+    if (!data.source) newErrors.source = 'Source is required';
+    if (!data.destination) newErrors.destination = 'Destination is required';
     if (!data.bus_id) newErrors.bus_id = 'Vehicle assignment is required';
     if (!data.departure_time) newErrors.departure_time = 'Departure time is required';
     if (!data.arrival_time) newErrors.arrival_time = 'Arrival time is required';
@@ -42,14 +44,7 @@ const TripForm = ({ routes = [], buses = [], initialData, onSave, onCancel, isEd
     validate(newData);
   };
 
-  const isFormValid = formData.route_id && formData.bus_id && formData.departure_time && formData.arrival_time && formData.price && Object.keys(errors).length === 0;
-
-  // Prepare options for SearchableSelect
-  const routeOptions = routes.map(r => ({
-    value: r.id,
-    label: r.name || `${r.source} to ${r.destination}`,
-    sublabel: `${r.source} → ${r.destination}`
-  }));
+  const isFormValid = formData.source && formData.destination && formData.bus_id && formData.departure_time && formData.arrival_time && formData.price && Object.keys(errors).length === 0;
 
   const busOptions = buses.map(b => ({
     value: b.id,
@@ -67,14 +62,31 @@ const TripForm = ({ routes = [], buses = [], initialData, onSave, onCancel, isEd
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <SearchableSelect 
-          label="Select Network Route"
-          options={routeOptions}
-          value={formData.route_id}
-          onChange={(val) => handleChange('route_id', val)}
-          placeholder="Search defined routes..."
-          error={errors.route_id}
+        <Input 
+          label="Source City"
+          placeholder="e.g. Hyderabad"
+          value={formData.source}
+          onChange={(e) => handleChange('source', e.target.value)}
+          error={errors.source}
           required
+        />
+        <Input 
+          label="Destination City"
+          placeholder="e.g. Bangalore"
+          value={formData.destination}
+          onChange={(e) => handleChange('destination', e.target.value)}
+          error={errors.destination}
+          required
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Input 
+          label="Routing Points (Optional)"
+          placeholder="e.g. Kurnool, Anantapur"
+          value={formData.routing_points}
+          onChange={(e) => handleChange('routing_points', e.target.value)}
+          helperText="Comma separated list of intermediate stops"
         />
         
         <SearchableSelect 

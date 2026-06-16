@@ -6,17 +6,49 @@ import { Plus, Pencil, Trash2, Bus as BusIcon, Search, ShieldCheck, Activity } f
 import Badge from '../../../components/ui/Badge';
 import BusForm from '../../../components/admin/modules/buses/BusForm';
 import { useAdminStore } from '../../../store/useAdminStore';
+import { useAuthStore } from '../../../store/useAuthStore';
+import { adminService } from '../../../services/adminService';
 import { toast } from 'react-hot-toast';
 
 /**
  * BusList Page - Fleet Manager (Local State Version).
  */
 const BusList = () => {
-  const { buses, addBus, updateBus, deleteBus } = useAdminStore();
+  const { buses, setBuses, addBus, updateBus, deleteBus } = useAdminStore();
+  const { user } = useAuthStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedBus, setSelectedBus] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchBuses = async () => {
+      if (!user?.id) return;
+      try {
+        setLoading(true);
+        const data = await adminService.getBuses(user.id);
+        
+        // Map backend fields to frontend store format
+        const mappedBuses = data.map(bus => ({
+          id: bus.bus_id || bus.id,
+          name: bus.bus_name,
+          vehicle_number: bus.bus_number,
+          category: bus.type,
+          total_seats: bus.capacity,
+          status: 'active' // Backend doesn't provide status yet, defaulting to active
+        }));
+        
+        setBuses(mappedBuses);
+      } catch (err) {
+        console.error("Failed to load buses from API:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBuses();
+  }, [user?.id, setBuses]);
 
   const handleCreate = () => {
     setSelectedBus(null);
@@ -29,24 +61,57 @@ const BusList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Permanently remove this vehicle?")) return;
-    deleteBus(id);
-    toast.success("Vehicle removed from fleet");
+    if (!window.confirm("Permanently remove this vehicle from the fleet?")) return;
+    
+    try {
+      setIsSubmitting(true);
+      const response = await adminService.deleteBus(id, user?.id || "SB_ADMIN_6549");
+      deleteBus(id);
+      toast.success(response.message || "Vehicle removed from fleet");
+    } catch (err) {
+      console.error("Failed to delete bus:", err);
+      toast.error(err.response?.data?.message || err.response?.data?.detail || "Failed to remove vehicle. It might be assigned to active trips.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSave = async (data) => {
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const payload = {
+        user_id: user?.id || "SB_ADMIN_6549",
+        bus_number: data.vehicle_number,
+        bus_name: data.name,
+        type: data.category,
+        capacity: data.total_seats
+      };
+
       if (selectedBus) {
+        // Update logic using actual API
+        const response = await adminService.updateBus(selectedBus.id, payload);
         updateBus(selectedBus.id, data);
-        toast.success("Vehicle specs updated");
+        toast.success(response.message || "Vehicle specs updated successfully");
       } else {
-        addBus(data);
-        toast.success("New asset registered locally");
+        // Add logic using actual API
+        const response = await adminService.addBus(payload);
+        
+        // Add to local store with the returned ID
+        addBus({ 
+          ...data, 
+          id: response.bus_id || response.id,
+          status: 'active' // Default for new buses
+        });
+        
+        toast.success(response.message || "New asset registered successfully");
       }
       setModalOpen(false);
+    } catch (err) {
+      console.error("Failed to save bus:", err);
+      toast.error(err.response?.data?.message || err.response?.data?.detail || "Operation failed. Please check connection.");
+    } finally {
       setIsSubmitting(false);
-    }, 400);
+    }
   };
 
   const filteredBuses = buses.filter(b => 
@@ -137,7 +202,7 @@ const BusList = () => {
       <AdminTable 
         columns={columns} 
         data={filteredBuses} 
-        loading={isSubmitting} 
+        loading={loading || isSubmitting} 
         emptyMessage="No vehicles registered in your fleet yet."
       />
 

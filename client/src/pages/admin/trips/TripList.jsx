@@ -6,6 +6,8 @@ import { Plus, Pencil, Trash2, Calendar, Bus, Route as RouteIcon, Search, ArrowR
 import Badge from '../../../components/ui/Badge';
 import TripForm from '../../../components/admin/modules/trips/TripForm';
 import { useAdminStore } from '../../../store/useAdminStore';
+import { useAuthStore } from '../../../store/useAuthStore';
+import { adminService } from '../../../services/adminService';
 import { toast } from 'react-hot-toast';
 import { formatTime12h, formatPrice, formatDate } from '../../../utils/formatters';
 
@@ -13,11 +15,48 @@ import { formatTime12h, formatPrice, formatDate } from '../../../utils/formatter
  * TripList Page - Manages scheduled Trip Instances (Local State Version).
  */
 const TripList = () => {
-  const { trips, routes, buses, addTrip, updateTrip, deleteTrip } = useAdminStore();
+  const { trips, setTrips, routes, buses, addTrip, updateTrip, deleteTrip } = useAdminStore();
+  const { user } = useAuthStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchTrips = async () => {
+      if (!user?.id) return;
+      try {
+        setLoading(true);
+        const data = await adminService.getTrips(user.id);
+        
+        // Map backend fields to frontend store format
+        // This assumes the backend returns detailed trip objects
+        const mappedTrips = data.map(trip => ({
+          id: trip.trip_id || trip.id,
+          source: trip.source,
+          destination: trip.destination,
+          departure_time: trip.departure_time,
+          arrival_time: trip.arrival_time,
+          price: trip.price,
+          route_id: trip.route_id,
+          bus_id: trip.bus_id,
+          bus: trip.bus || { 
+            name: trip.bus_name || 'N/A', 
+            vehicle_number: trip.bus_number || 'N/A' 
+          }
+        }));
+        
+        setTrips(mappedTrips);
+      } catch (err) {
+        console.error("Failed to load trips from API:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrips();
+  }, [user?.id, setTrips]);
 
   const handleCreate = () => {
     setSelectedTrip(null);
@@ -30,24 +69,85 @@ const TripList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Cancel this trip?")) return;
-    deleteTrip(id);
-    toast.success("Trip schedule removed");
+    if (!window.confirm("Permanently cancel this trip schedule?")) return;
+    
+    try {
+      setIsSubmitting(true);
+      const response = await adminService.deleteTrip(id, user?.id || "SB_ADMIN_6549");
+      deleteTrip(id);
+      toast.success(response.message || "Trip schedule removed");
+    } catch (err) {
+      console.error("Failed to cancel trip:", err);
+      toast.error(err.response?.data?.message || err.response?.data?.detail || "Failed to remove trip. It might have active bookings.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSave = async (payload) => {
+  const handleSave = async (data) => {
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const bus = buses.find(b => b.id === parseInt(data.bus_id));
+
+      if (!bus) {
+        toast.error("Critical: Invalid vehicle selection");
+        return;
+      }
+
+      // Convert routing_points string to array if it's a string (from form)
+      const routing_points = typeof data.routing_points === 'string'
+        ? data.routing_points.split(',').map(s => s.trim()).filter(s => s)
+        : (data.routing_points || []);
+
+      const payload = {
+        user_id: user?.id || "SB_ADMIN_6549",
+        bus_id: parseInt(data.bus_id),
+        source: data.source,
+        destination: data.destination,
+        departure_time: data.departure_time,
+        arrival_time: data.arrival_time,
+        price: parseFloat(data.price),
+        routing_points: routing_points
+      };
+
       if (selectedTrip) {
-        updateTrip(selectedTrip.id, payload);
-        toast.success("Schedule adjusted");
+        // Update logic using actual API
+        const response = await adminService.updateTrip(selectedTrip.id, payload, user?.id || "SB_ADMIN_6549");
+        updateTrip(selectedTrip.id, {
+          ...data,
+          routing_points,
+          bus: {
+            name: bus.name,
+            vehicle_number: bus.vehicle_number,
+            category: bus.category
+          }
+        });
+        toast.success(response.message || "Schedule adjusted successfully");
       } else {
-        addTrip(payload);
-        toast.success("Trip launched successfully (local)");
+        // Add logic using actual API
+        const response = await adminService.addTrip(payload);
+        
+        // Add to local store with details for the UI
+        addTrip({
+          ...data,
+          id: response.trip_id || response.id,
+          routing_points,
+          bus: {
+            name: bus.name,
+            vehicle_number: bus.vehicle_number,
+            category: bus.category
+          }
+        });
+        
+        toast.success(response.message || "Trip launched successfully");
       }
       setModalOpen(false);
+    } catch (err) {
+      console.error("Failed to schedule trip:", err);
+      toast.error(err.response?.data?.message || err.response?.data?.detail || "Operation failed. Possible scheduling conflict.");
+    } finally {
       setIsSubmitting(false);
-    }, 450);
+    }
   };
 
   const filteredTrips = trips.filter(t => 
@@ -146,7 +246,7 @@ const TripList = () => {
       <AdminTable 
         columns={columns} 
         data={filteredTrips} 
-        loading={isSubmitting} 
+        loading={loading || isSubmitting} 
         emptyMessage="No trips scheduled for the selected period."
       />
 
