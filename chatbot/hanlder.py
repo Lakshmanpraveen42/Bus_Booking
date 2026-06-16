@@ -69,7 +69,8 @@ def chatbot_handler(user_id: str, session_id: str, message: str, db):
                 "manage your tickets, and provide personalized travel updates!"
             ),
             "intent": active_intent,
-            "entities": entities
+            "entities": entities,
+            "data": []
         }
 
 

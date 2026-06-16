@@ -3,6 +3,44 @@ import json
 from datetime import datetime, timedelta, time
 from db.database import SessionLocal, engine
 from db.models import Base, User, Bus, Seat, Trip, TripSeat, Booking, OTP
+from services.auth import hash_password
+
+# Predefined Bidirectional Routes and Intermediate Stops
+ROUTES = [
+    # 1. Hyderabad ↔ Palakollu
+    {
+        "source": "Hyderabad",
+        "destination": "Palakollu",
+        "routing_points": ["Hyderabad", "LB Nagar", "Choutuppal", "Suryapet", "Kodad", "Nandigama", "Vijayawada", "Hanuman Junction", "Eluru", "Tadepalligudem", "Tanuku", "Attili", "Bhimavaram", "Palakollu"]
+    },
+    {
+        "source": "Palakollu",
+        "destination": "Hyderabad",
+        "routing_points": ["Palakollu", "Bhimavaram", "Attili", "Tanuku", "Tadepalligudem", "Eluru", "Hanuman Junction", "Vijayawada", "Nandigama", "Kodad", "Suryapet", "Choutuppal", "LB Nagar", "Hyderabad"]
+    },
+    # 2. Chennai ↔ Palakollu
+    {
+        "source": "Chennai",
+        "destination": "Palakollu",
+        "routing_points": ["Chennai", "Nellore", "Ongole", "Chilakaluripet", "Guntur", "Vijayawada", "Hanuman Junction", "Eluru", "Tadepalligudem", "Tanuku", "Attili", "Bhimavaram", "Palakollu"]
+    },
+    {
+        "source": "Palakollu",
+        "destination": "Chennai",
+        "routing_points": ["Palakollu", "Bhimavaram", "Attili", "Tanuku", "Tadepalligudem", "Eluru", "Hanuman Junction", "Vijayawada", "Guntur", "Chilakaluripet", "Ongole", "Nellore", "Chennai"]
+    },
+    # 3. Vijayawada ↔ Hyderabad
+    {
+        "source": "Vijayawada",
+        "destination": "Hyderabad",
+        "routing_points": ["Vijayawada", "Nandigama", "Kodad", "Suryapet", "Choutuppal", "LB Nagar", "Hyderabad"]
+    },
+    {
+        "source": "Hyderabad",
+        "destination": "Vijayawada",
+        "routing_points": ["Hyderabad", "LB Nagar", "Choutuppal", "Suryapet", "Kodad", "Nandigama", "Vijayawada"]
+    }
+]
 
 def init_db():
     """Create all tables based on models"""
@@ -14,18 +52,17 @@ def seed_basic_data():
     db = SessionLocal()
     try:
         print("Seeding basic data...")
-        # Users
-        for i in range(1, 6):
-            db.add(User(
-                id=f"SB_USER_{i}",
-                name=f"Test User {i}",
-                email=f"test{i}@smartbus.in",
-                phone=f"910000000{i}",
-                hashed_password="secure_password",
-                is_active=True,
-                is_verified=True,
-                is_admin=(i==1) # First user is admin
-            ))
+        # Admin User
+        db.add(User(
+            id="SB_ADMIN_1",
+            name="Super_Admin",
+            email="Admin.123@gmail.com",
+            phone="7993524677",
+            hashed_password=hash_password("P@ssw0rd@123"),
+            is_active=True,
+            is_verified=True,
+            is_admin=True
+        ))
         
         # Buses
         bus_names = ["Orange Travels", "Kaveri Travels", "Morning Star Travels", "APSRTC Garuda", "TGSRTC Lahari"]
@@ -58,7 +95,6 @@ def seed_bulk_inventory():
     try:
         print("Adding bulk inventory (60 buses + hundreds of trips)...")
         bus_operators = ["Orange", "Kaveri", "Morning Star", "Dharani", "Sri Krishna", "APSRTC", "TGSRTC"]
-        cities = ["Hyderabad", "Vijayawada", "Visakhapatnam", "Tirupati", "Kurnool", "Warangal", "Nellore", "Guntur", "Anantapur", "Kadapa", "Palakollu", "Bhimavaram"]
         
         for i in range(1, 61):
             bus = Bus(
@@ -76,15 +112,18 @@ def seed_bulk_inventory():
 
             # Create 5-10 trips for this bus
             for _ in range(random.randint(5, 10)):
-                src, dest = random.sample(cities, 2)
-                departure = datetime.now() + timedelta(days=random.randint(1, 15), hours=random.randint(0, 23))
+                route = random.choice(ROUTES)
+                src = route["source"]
+                dest = route["destination"]
+                route_points = route["routing_points"]
+                departure = datetime.now() + timedelta(days=random.randint(0, 60), hours=random.randint(0, 23))
                 arrival = departure + timedelta(hours=random.randint(4, 10))
                 
                 trip = Trip(
                     bus_id=bus.id, source=src, destination=dest,
                     departure_time=departure, arrival_time=arrival,
                     price=random.randint(500, 2000),
-                    routing_points=random.sample([c for c in cities if c not in [src, dest]], random.randint(1, 3))
+                    routing_points=route_points
                 )
                 db.add(trip)
                 db.flush()
@@ -105,11 +144,8 @@ def fix_routing_points():
     try:
         print("Fixing routing points...")
         trips = db.query(Trip).all()
-        cities = ["Suryapet", "Vijayawada", "Khammam", "Guntur", "Kodad"]
         for t in trips:
-            if not t.routing_points:
-                t.routing_points = random.sample(cities, 3)
-            elif isinstance(t.routing_points, str):
+            if isinstance(t.routing_points, str):
                 try:
                     t.routing_points = json.loads(t.routing_points)
                 except:

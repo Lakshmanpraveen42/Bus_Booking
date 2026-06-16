@@ -433,10 +433,10 @@ def handle_chat(data: ChatRequest, db: Session = Depends(get_db)):
     # Call the new AI Handler with session_id
     result = chatbot_handler(data.user_id, data.session_id, data.message, db)
     return {
-        "intent": result["intent"],
-        "message": result["response"],
-        "entities": result["entities"],
-        "data": result["data"]
+        "intent": result.get("intent", ""),
+        "message": result.get("response", ""),
+        "entities": result.get("entities", {}),
+        "data": result.get("data", [])
     }
 
 
