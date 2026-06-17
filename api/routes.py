@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -55,10 +55,7 @@ def get_all_trip_seats(db: Session = Depends(get_db)):
 
 
 
-@router.get("/users")
-def get_users(db: Session = Depends(get_db)):
-    users = db.query(User).all()
-    return users
+
 
 @router.post("/register")
 def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
@@ -218,13 +215,16 @@ def admin_login(data: UserLogin, db: Session = Depends(get_db)):
             "is_admin": user.is_admin
         }
     }
-@router.get("/users")
-def get_all_users(db: Session = Depends(get_db)):
+@router.get("/admin/users")
+def get_admin_users(db: Session = Depends(get_db)):
+    """Fetch all users."""
     users = db.query(User).all()
     return [
         {
+            "id": u.id,
             "user_id": u.id,
             "name": u.name,
+            "full_name": u.name,
             "email": u.email,
             "phone": u.phone,
             "is_admin": u.is_admin,
@@ -387,6 +387,10 @@ def get_user_bookings(user_id: str, db: Session = Depends(get_db)):
     
     result = []
     for b in bookings:
+        trip = db.query(Trip).filter(Trip.id == b.trip_id).first()
+        dep_time = trip.departure_time.strftime("%Y-%m-%d %H:%M") if (trip and trip.departure_time) else None
+        arr_time = trip.arrival_time.strftime("%Y-%m-%d %H:%M") if (trip and trip.arrival_time) else None
+        
         result.append({
             "booking_id": b.id,
             "trip_id": b.trip_id,
@@ -397,13 +401,10 @@ def get_user_bookings(user_id: str, db: Session = Depends(get_db)):
             "total_amount": b.total_amount,
             "status": b.status,
             "booking_time": b.booking_time.strftime("%Y-%m-%d %H:%M"),
-            "passengers": b.passenger_details or []
-
+            "passengers": b.passenger_details or [],
+            "departure_time": dep_time,
+            "arrival_time": arr_time
         })
-    return result
-
-
-        
     return result
 
 from services.booking_service import perform_cancellation
@@ -479,6 +480,10 @@ def get_booking_details(data: BookingViewRequest, db: Session = Depends(get_db))
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found or access denied")
         
+    trip = db.query(Trip).filter(Trip.id == booking.trip_id).first()
+    dep_time = trip.departure_time.strftime("%Y-%m-%d %H:%M") if (trip and trip.departure_time) else None
+    arr_time = trip.arrival_time.strftime("%Y-%m-%d %H:%M") if (trip and trip.arrival_time) else None
+        
     return {
         "booking_id": booking.id,
         "bus_name": booking.bus_name,
@@ -487,8 +492,11 @@ def get_booking_details(data: BookingViewRequest, db: Session = Depends(get_db))
         "total_amount": booking.total_amount,
         "status": booking.status,
         "booking_time": booking.booking_time,
-        "passenger_details": booking.passenger_details or []
+        "passenger_details": booking.passenger_details or [],
+        "departure_time": dep_time,
+        "arrival_time": arr_time
     }
+
 
 
 def check_admin(user_id: str, db: Session):
@@ -561,6 +569,10 @@ def get_bookings_by_email(email: str, db: Session = Depends(get_db)):
     
     result = []
     for b in bookings:
+        trip = db.query(Trip).filter(Trip.id == b.trip_id).first()
+        dep_time = trip.departure_time.strftime("%Y-%m-%d %H:%M") if (trip and trip.departure_time) else None
+        arr_time = trip.arrival_time.strftime("%Y-%m-%d %H:%M") if (trip and trip.arrival_time) else None
+
         result.append({
             "booking_id": b.id,
             "trip_id": b.trip_id,
@@ -571,7 +583,9 @@ def get_bookings_by_email(email: str, db: Session = Depends(get_db)):
             "total_amount": b.total_amount,
             "status": b.status,
             "booking_time": b.booking_time.strftime("%Y-%m-%d %H:%M"),
-            "passengers": b.passenger_details or []
+            "passengers": b.passenger_details or [],
+            "departure_time": dep_time,
+            "arrival_time": arr_time
         })
     return result
 
@@ -656,3 +670,95 @@ def admin_get_trip(trip_id: int, user_id: str, db: Session = Depends(get_db)):
     trip = db.query(Trip).filter(Trip.id == trip_id).first()
     if not trip: raise HTTPException(status_code=404, detail="Trip not found")
     return trip
+
+@router.delete("/admin/users/{delete_user_id}")
+def admin_delete_user(delete_user_id: str, db: Session = Depends(get_db)):
+    """Delete a user account."""
+    
+    # Check if target user exists
+    user_to_delete = db.query(User).filter(User.id == delete_user_id).first()
+    if not user_to_delete:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    # Delete associated user bookings
+    db.query(Booking).filter(Booking.user_id == delete_user_id).delete()
+    
+    # Delete associated OTPs for the user's phone number
+    if user_to_delete.phone:
+        db.query(OTP).filter(OTP.phone == user_to_delete.phone).delete()
+        
+    # Delete target user
+    db.delete(user_to_delete)
+    db.commit()
+    
+    return {"message": f"User {delete_user_id} deleted successfully."}
+
+@router.get("/admin/bookings")
+def get_admin_bookings(db: Session = Depends(get_db)):
+    """Fetch all bookings for admin overview."""
+    from sqlalchemy.orm import joinedload
+    
+    bookings = db.query(Booking).all()
+    result = []
+    for b in bookings:
+        trip = db.query(Trip).options(joinedload(Trip.bus)).filter(Trip.id == b.trip_id).first()
+        
+        # Calculate seat_numbers string from passenger_details list
+        # Map seat_number to seatId for passenger details to match the frontend expectations
+        seat_list = []
+        passengers_formatted = []
+        if b.passenger_details:
+            for p in b.passenger_details:
+                if isinstance(p, dict):
+                    # Check for seat number in either seat_number or seatId
+                    s_num = p.get("seat_number") or p.get("seatId")
+                    if s_num:
+                        seat_list.append(s_num)
+                    
+                    # Create formatted passenger info that has seatId and seat_number
+                    p_formatted = p.copy()
+                    if "seat_number" in p_formatted and "seatId" not in p_formatted:
+                        p_formatted["seatId"] = p_formatted["seat_number"]
+                    passengers_formatted.append(p_formatted)
+                else:
+                    passengers_formatted.append(p)
+                    
+        seat_numbers = ",".join(seat_list)
+        
+        # Format passenger_details as JSON string for the frontend's JSON.parse()
+        pass_details_str = json.dumps(passengers_formatted) if passengers_formatted else "[]"
+        
+        # Build trip details
+        trip_data = None
+        if trip:
+            trip_data = {
+                "id": trip.id,
+                "source": trip.source,
+                "destination": trip.destination,
+                "departure_time": trip.departure_time.strftime("%Y-%m-%dT%H:%M:%SZ") if trip.departure_time else None,
+                "arrival_time": trip.arrival_time.strftime("%Y-%m-%dT%H:%M:%SZ") if trip.arrival_time else None,
+                "price": trip.price,
+                "bus": {
+                    "id": trip.bus.id,
+                    "bus_name": trip.bus.bus_name,
+                    "bus_number": trip.bus.bus_number,
+                    "type": trip.bus.type,
+                    "category": trip.bus.type
+                } if trip.bus else None
+            }
+            
+        result.append({
+            "id": b.id,
+            "user_id": b.user_id,
+            "booking_time": b.booking_time.strftime("%Y-%m-%dT%H:%M:%SZ") if b.booking_time else None,
+            "seat_numbers": seat_numbers,
+            "total_amount": b.total_amount,
+            "status": b.status,
+            "payment_status": b.payment_status,
+            "boarding_point": b.source,
+            "dropping_point": b.destination,
+            "passenger_details": pass_details_str,
+            "trip": trip_data
+        })
+    return result
+

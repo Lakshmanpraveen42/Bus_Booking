@@ -28,8 +28,8 @@ def generate_ticket_pdf(booking_id: int, db: Session):
 
     
     travel_date = trip.departure_time.strftime("%a, %d %b %Y") if trip else booking.booking_time.strftime("%a, %d %b %Y")
-    dep_time = trip.departure_time.strftime("%I:%M %p") if trip else "N/A"
-    rep_time = (trip.departure_time - timedelta(minutes=30)).strftime("%I:%M %p") if trip else "N/A"
+    dep_time = trip.departure_time.strftime("%Y-%m-%d %H:%M") if trip else "N/A"
+    arr_time = trip.arrival_time.strftime("%Y-%m-%d %H:%M") if (trip and trip.arrival_time) else "N/A"
     
     # 3. HTML Template (Real-World Structured Layout)
     html_template = f"""
@@ -99,12 +99,12 @@ def generate_ticket_pdf(booking_id: int, db: Session):
                     <div class="value">{booking.bus_name}</div>
                 </td>
                 <td width="25%">
-                    <div class="label">Reporting Time</div>
-                    <div class="value">{rep_time}</div>
-                </td>
-                <td width="25%">
                     <div class="label">Departure Time</div>
                     <div class="value">{dep_time}</div>
+                </td>
+                <td width="25%">
+                    <div class="label">Arrival Time</div>
+                    <div class="value">{arr_time}</div>
                 </td>
                 <td width="25%">
                     <div class="label">Seat Number(s)</div>
