@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Bus, Mail, Phone, MapPin, 
-  Facebook, Twitter, Instagram, Linkedin, 
-  Send, ShieldCheck, Heart 
+import {
+  Bus, Mail, Phone, MapPin,
+  Facebook, Twitter, Instagram, Linkedin,
+  Send, ShieldCheck, Heart
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -34,7 +34,6 @@ const Footer = () => {
     ],
     support: [
       { name: 'Help Center', path: '/help' },
-      { name: 'Track Bus', path: '/track' },
       { name: 'Cancellation', path: '/cancellation' },
       { name: 'FAQ', path: '/faq' }
     ],
@@ -50,12 +49,12 @@ const Footer = () => {
     <footer className="bg-slate-950 pt-20 pb-10 text-white relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-500/5 rounded-full blur-[120px] -mr-64 -mt-64" />
-      
+
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        
+
         {/* Main Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-20">
-          
+
           {/* Section 1: Brand */}
           <div className="lg:col-span-4 space-y-8 text-center md:text-left">
             <Link to="/" className="flex items-center justify-center md:justify-start gap-3">
@@ -68,10 +67,10 @@ const Footer = () => {
               India's most trusted bus booking platform. Experience seamless travel with state-of-the-art fleet and high-fidelity service.
             </p>
             <div className="flex items-center justify-center md:justify-start gap-4">
-               <SocialIcon icon={<Facebook className="w-5 h-5" />} />
-               <SocialIcon icon={<Twitter className="w-5 h-5" />} />
-               <SocialIcon icon={<Instagram className="w-5 h-5" />} />
-               <SocialIcon icon={<Linkedin className="w-5 h-5" />} />
+              <SocialIcon icon={<Facebook className="w-5 h-5" />} />
+              <SocialIcon icon={<Twitter className="w-5 h-5" />} />
+              <SocialIcon icon={<Instagram className="w-5 h-5" />} />
+              <SocialIcon icon={<Linkedin className="w-5 h-5" />} />
             </div>
           </div>
 
@@ -96,17 +95,17 @@ const Footer = () => {
           <div className="lg:col-span-3 space-y-8">
             <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary-500">Stay Updated</h4>
             <p className="text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-widest">Subscribe to get exclusive deals & trip alerts.</p>
-            
+
             <form onSubmit={handleSubscribe} className="relative group">
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-sm font-bold focus:outline-none focus:border-primary-500 focus:bg-white/10 transition-all"
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading}
                 className="absolute right-2 top-2 w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary-500 transition-all active:scale-90"
               >
@@ -126,19 +125,19 @@ const Footer = () => {
 
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 py-5">
-           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10">
-              <ContactInfo icon={<Phone />} label="+91 91234 56789" href="tel:+919123456789" />
-              <ContactInfo icon={<Mail />} label="support@smartbus.com" href="mailto:support@smartbus.com" />
-              <ContactInfo icon={<MapPin />} label="Kadapa, Andhra Pradesh" />
-           </div>
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10">
+            <ContactInfo icon={<Phone />} label="+91 91234 56789" href="tel:+919123456789" />
+            <ContactInfo icon={<Mail />} label="support@smartbus.com" href="mailto:support@smartbus.com" />
+            <ContactInfo icon={<MapPin />} label="Palakollu, Andhra Pradesh" />
+          </div>
 
-           <div className="flex items-center gap-6">
-              <Link to="/privacy" className="text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-white transition-all">Privacy</Link>
-              <Link to="/terms" className="text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-white transition-all">Terms</Link>
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-700">
-                MADE WITH <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> IN INDIA
-              </div>
-           </div>
+          <div className="flex items-center gap-6">
+            <Link to="/privacy" className="text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-white transition-all">Privacy</Link>
+            <Link to="/terms" className="text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-white transition-all">Terms</Link>
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-700">
+              MADE WITH <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> IN INDIA
+            </div>
+          </div>
         </div>
       </div>
     </footer>
@@ -165,7 +164,7 @@ const ContactInfo = ({ icon, label, href }) => {
       <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white transition-all">{label}</span>
     </div>
   );
-  
+
   return href ? <a href={href}>{content}</a> : <div>{content}</div>;
 };
 

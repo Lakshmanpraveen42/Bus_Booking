@@ -90,7 +90,7 @@ const ManageBuses = () => {
             <input 
               type="text" 
               placeholder="Search by bus name or number..." 
-              className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary-500 transition-all shadow-sm"
+              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3 pl-12 pr-4 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 transition-all shadow-sm"
             />
           </div>
         </div>
@@ -105,11 +105,11 @@ const ManageBuses = () => {
       </div>
 
       {/* Fleet Table */}
-      <div className="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-[40px] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/50 text-slate-400 text-xs font-black uppercase tracking-widest border-b border-slate-50">
+              <tr className="bg-slate-50/50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 text-xs font-black uppercase tracking-widest border-b border-slate-50 dark:border-slate-800 transition-colors">
                 <th className="px-8 py-6">Bus Detail</th>
                 <th className="px-8 py-6">Vehicle Number</th>
                 <th className="px-8 py-6">Type</th>
@@ -117,44 +117,44 @@ const ManageBuses = () => {
                 <th className="px-8 py-6 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800 transition-colors">
               {loading ? (
                 <tr><td colSpan="5" className="px-8 py-10 text-center text-slate-400 font-bold uppercase tracking-widest">Loading fleet...</td></tr>
               ) : buses.length === 0 ? (
                 <tr><td colSpan="5" className="px-8 py-10 text-center text-slate-400 font-bold uppercase tracking-widest">No vehicles registered</td></tr>
               ) : buses.map((bus) => (
-                <tr key={bus.id} className="group hover:bg-slate-50/50 transition-all duration-300">
+                <tr key={bus.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-all duration-300">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600 group-hover:bg-primary-50 group-hover:text-primary-500 transition-colors">
+                      <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-500 transition-colors">
                         <Bus className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="font-black text-slate-900 leading-none mb-1">{bus.name}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">ID: {bus.id}</p>
+                        <p className="font-black text-slate-900 dark:text-slate-100 leading-none mb-1 transition-colors">{bus.name}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest transition-colors">ID: {bus.id}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <span className="font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg text-sm">{bus.vehicle_number}</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-sm transition-colors">{bus.vehicle_number}</span>
                   </td>
-                  <td className="px-8 py-6 text-sm text-slate-600 font-medium lowercase first-letter:uppercase">
+                  <td className="px-8 py-6 text-sm text-slate-600 dark:text-slate-400 font-medium lowercase first-letter:uppercase transition-colors">
                     {bus.category}
                   </td>
-                  <td className="px-8 py-6 font-bold text-slate-900">
+                  <td className="px-8 py-6 font-bold text-slate-900 dark:text-slate-100 transition-colors">
                     {bus.total_seats}
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={() => openEditModal(bus)}
-                        className="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-primary-500 hover:text-white transition-all"
+                        className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-primary-500 hover:text-white transition-all"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleDeleteBus(bus.id)}
-                        className="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-rose-500 hover:text-white transition-all"
+                        className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-rose-500 hover:text-white transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -183,9 +183,9 @@ const ManageBuses = () => {
           />
           <div className="grid grid-cols-2 gap-4">
              <div className="space-y-2">
-                <label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">Category</label>
+                <label className="text-xs font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest ml-1">Category</label>
                 <select 
-                  className="w-full bg-slate-50 border-2 border-transparent focus:border-primary-500 rounded-2xl p-4 text-sm font-bold focus:outline-none transition-all"
+                  className="w-full bg-slate-50 dark:bg-slate-900/50 border-2 border-transparent dark:border-slate-800 focus:border-primary-500 dark:focus:border-primary-500 rounded-2xl p-4 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none transition-all"
                   value={newBus.category}
                   onChange={(e) => setNewBus({...newBus, category: e.target.value})}
                 >

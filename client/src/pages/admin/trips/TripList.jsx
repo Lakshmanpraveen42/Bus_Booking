@@ -41,6 +41,7 @@ const TripList = () => {
           price: trip.price,
           route_id: trip.route_id,
           bus_id: trip.bus_id,
+          routing_points: Array.isArray(trip.routing_points) ? trip.routing_points.join(', ') : (trip.routing_points || ''),
           bus: trip.bus || { 
             name: trip.bus_name || 'N/A', 
             vehicle_number: trip.bus_number || 'N/A' 

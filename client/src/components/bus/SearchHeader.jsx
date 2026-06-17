@@ -33,7 +33,7 @@ const CitySearchDropdown = ({ label, value, onChange, placeholder, icon: Icon, i
   return (
     <div className="relative flex-1" ref={dropdownRef}>
       <div 
-        className={`flex items-center gap-3 px-4 py-3 bg-white cursor-text transition-all ${open ? 'ring-2 ring-primary-500/20' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 cursor-text transition-all ${open ? 'ring-2 ring-primary-500/20' : ''}`}
         onClick={() => setOpen(true)}
       >
         <Icon className={`w-5 h-5 ${iconColor}`} />
@@ -46,7 +46,7 @@ const CitySearchDropdown = ({ label, value, onChange, placeholder, icon: Icon, i
             }}
             onFocus={() => setOpen(true)}
             placeholder={placeholder}
-            className="w-full text-sm font-bold bg-transparent outline-none placeholder:text-slate-300"
+            className="w-full text-sm font-bold bg-transparent text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-300 dark:placeholder:text-slate-600"
           />
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">
             {value === query ? (value.slice(0, 3).toUpperCase() || '---') : 'Select Location'}
@@ -55,23 +55,23 @@ const CitySearchDropdown = ({ label, value, onChange, placeholder, icon: Icon, i
       </div>
 
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-100 z-[100] py-2 animate-fade-in">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-700 z-[100] py-2 animate-fade-in">
           {filtered.length > 0 ? (
             filtered.map((city) => (
-              <button
+                <button
                 key={city}
                 type="button"
-                className="w-full text-left px-4 py-3 hover:bg-slate-50 flex items-center gap-3 group transition-colors"
+                className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-3 group transition-colors"
                 onClick={() => {
                   onChange(city);
                   setQuery(city);
                   setOpen(false);
                 }}
               >
-                <div className="w-8 h-8 rounded-lg bg-slate-50 group-hover:bg-primary-50 flex items-center justify-center text-slate-400 group-hover:text-primary-500 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-700 group-hover:bg-primary-50 dark:group-hover:bg-primary-500/20 flex items-center justify-center text-slate-400 group-hover:text-primary-500 transition-colors">
                   <MapPin className="w-4 h-4" />
                 </div>
-                <span className="text-sm font-bold text-slate-700">{city}</span>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100">{city}</span>
               </button>
             ))
           ) : (
@@ -131,9 +131,9 @@ const SearchHeader = () => {
   };
 
   return (
-    <div className="bg-white border-b border-slate-100 py-4 shadow-sm sticky top-[76px] z-40">
+    <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 py-4 shadow-sm sticky top-[76px] z-40 transition-colors">
       <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-4">
-        <div className="flex-1 relative flex flex-col md:flex-row items-stretch border border-slate-200 rounded-xl overflow-visible bg-white">
+        <div className="flex-1 relative flex flex-col md:flex-row items-stretch border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-visible bg-white dark:bg-slate-900 transition-colors">
           
           {/* Source */}
           <CitySearchDropdown
@@ -151,12 +151,12 @@ const SearchHeader = () => {
             <div className="absolute md:relative z-20">
               <button 
                 onClick={handleSwap}
-                className="bg-white border border-slate-200 rounded-full w-10 h-10 flex items-center justify-center text-slate-400 hover:text-primary-500 hover:border-primary-200 transition-all shadow-sm hover:shadow-md group active:scale-95"
+                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full w-10 h-10 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-primary-500 dark:hover:text-primary-400 hover:border-primary-200 dark:hover:border-primary-500/30 transition-all shadow-sm hover:shadow-md group active:scale-95"
               >
                 <ArrowLeftRight className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
               </button>
             </div>
-            <div className="hidden md:block w-px h-10 bg-slate-100" />
+            <div className="hidden md:block w-px h-10 bg-slate-100 dark:bg-slate-800" />
           </div>
 
           {/* Destination */}
@@ -170,10 +170,10 @@ const SearchHeader = () => {
             cities={cities}
           />
 
-          <div className="hidden md:block w-px h-10 bg-slate-100 self-center" />
+          <div className="hidden md:block w-px h-10 bg-slate-100 dark:bg-slate-800 self-center" />
 
           {/* Date Picker */}
-          <div className="flex-1 flex items-center bg-white rounded-r-xl relative">
+          <div className="flex-1 flex items-center bg-white dark:bg-slate-900 rounded-r-xl relative">
             <CustomDatePicker
               selectedDate={date ? parseISO(date) : null}
               onChange={(d) => setDate(d ? format(d, 'yyyy-MM-dd') : '')}

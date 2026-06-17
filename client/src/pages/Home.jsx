@@ -42,35 +42,38 @@ const CityInput = ({ id, label, value, onChange, placeholder, icon: Icon, cities
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
           autoComplete="off"
-          className="w-full pl-12 pr-4 py-4 rounded-2xl text-slate-900 text-base font-bold bg-white border-2 border-transparent focus:border-primary-500 focus:outline-none transition-all shadow-sm placeholder:text-slate-300"
+          className="w-full pl-12 pr-4 py-4 rounded-2xl text-slate-900 dark:text-white text-base font-bold bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700/50 focus:border-primary-500 focus:outline-none transition-all shadow-sm placeholder:text-slate-300 dark:placeholder:text-slate-500"
         />
       </div>
       {open && (
         <ul 
-          className="absolute top-full mt-2 left-0 right-0 rounded-2xl border border-slate-200 overflow-hidden animate-fade-in py-1 shadow-[0_30px_60px_rgba(0,0,0,0.15)] bg-white"
-          style={{ zIndex: 999 }}
+          className="absolute top-full mt-3 left-0 right-0 rounded-2xl border border-slate-200/60 dark:border-slate-700 overflow-y-auto overflow-x-hidden max-h-[300px] animate-in fade-in slide-in-from-top-2 duration-200 py-2 shadow-[0_40px_80px_rgba(0,0,0,0.15)] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl"
+          style={{ zIndex: 9999 }}
         >
           {filtered.length > 0 ? (
             filtered.map((city) => (
-              <li key={city} className="bg-white">
+              <li key={city} className="px-2">
                 <button
                   type="button"
                   onMouseDown={() => { onChange(city); setOpen(false); }}
-                  className="w-full text-left px-5 py-4 text-sm font-bold text-slate-900 hover:bg-slate-50 hover:text-primary-600 flex items-center gap-4 transition-all group"
+                  className="w-full text-left px-4 py-3.5 rounded-xl text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-primary-50 dark:hover:bg-slate-800 hover:text-primary-600 flex items-center gap-4 transition-all group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-slate-50 group-hover:bg-primary-50 flex items-center justify-center text-slate-400 group-hover:text-primary-500 transition-colors">
+                  <div className="w-10 h-10 rounded-[0.8rem] bg-slate-100/80 dark:bg-slate-800 group-hover:bg-white dark:group-hover:bg-slate-700 flex items-center justify-center text-slate-400 group-hover:text-primary-500 transition-all shadow-sm group-hover:shadow-md">
                     <MapPin className="w-5 h-5 transition-transform group-hover:scale-110" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-base font-bold uppercase tracking-tight">{city}</span>
-                    <span className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Available Station</span>
+                    <span className="text-base font-black uppercase tracking-tight">{city}</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest group-hover:text-primary-400/80 transition-colors">Available Station</span>
                   </div>
                 </button>
               </li>
             ))
           ) : (
-            <li className="px-5 py-6 text-center text-slate-400 bg-white">
-              <p className="text-xs font-black uppercase tracking-widest opacity-50 italic">No locations found</p>
+            <li className="px-5 py-8 text-center flex flex-col items-center justify-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-500">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No locations found</p>
             </li>
           )}
         </ul>
@@ -133,7 +136,7 @@ const Home = () => {
   return (
     <PageWrapper isTransparent>
       {/* Hero */}
-      <section className="hero-gradient min-h-[85vh] flex flex-col items-center justify-center px-4 relative overflow-hidden pt-32">
+      <section className="hero-gradient min-h-[85vh] flex flex-col items-center justify-center px-4 relative pt-32">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 -right-20 w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[120px] animate-pulse" />
@@ -161,7 +164,7 @@ const Home = () => {
             
             <form 
               onSubmit={handleSearch} 
-              className="relative z-[200] bg-[#0f172a] rounded-[2.2rem] p-5 md:p-8 shadow-2xl border border-white/10"
+              className="relative z-[200] bg-[#0f172a] dark:bg-slate-900 rounded-[2.2rem] p-5 md:p-8 shadow-2xl border border-white/10 dark:border-slate-800"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5 items-end">
                 {/* From Field */}
@@ -182,7 +185,7 @@ const Home = () => {
                    <button
                     type="button"
                     onClick={handleSwap}
-                    className="w-12 h-12 bg-slate-50 hover:bg-primary-500 border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-all duration-500 hover:rotate-180 hover:shadow-lg hover:shadow-primary-500/20 group"
+                    className="w-12 h-12 bg-slate-50 dark:bg-slate-800 hover:bg-primary-500 dark:hover:bg-primary-500 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-all duration-500 hover:rotate-180 hover:shadow-lg hover:shadow-primary-500/20 group"
                     aria-label="Swap cities"
                   >
                     <ArrowLeftRight className="w-5 h-5 group-hover:scale-110 transition-transform" />

@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { 
   Bus, User, HelpCircle, ClipboardList, 
   ChevronDown, LogIn, UserPlus, Globe, 
-  Shield, Headset, LogOut, Check 
+  Shield, Headset, LogOut, Check, Moon, Sun
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useThemeStore } from '../../store/useThemeStore';
 
 const languages = [
   { code: 'en', label: 'English' },
@@ -80,37 +81,48 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 z-[100] px-6">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 z-[100] px-6 transition-colors">
       <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
         
         <Link to="/" className="flex items-center gap-2 group transition-transform active:scale-95">
           <div className="bg-red-500 p-2 rounded-lg text-white shadow-lg shadow-red-500/20">
             <Bus className="w-6 h-6" />
           </div>
-          <span className="text-xl font-bold text-gray-900 tracking-tight">
+          <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
             Smart<span className="text-red-500">Bus</span>
           </span>
         </Link>
 
         <nav className="flex items-center gap-8">
           <NavLink to="/my-bookings" className="flex items-center gap-2 group">
-             <ClipboardList className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" />
-             <span className="text-sm font-medium text-gray-700 group-hover:text-red-500 transition-colors">Bookings</span>
+             <ClipboardList className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-red-500 transition-colors" />
+             <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-red-500 transition-colors">Bookings</span>
           </NavLink>
 
           <NavLink to="/help" className="flex items-center gap-2 group">
-             <HelpCircle className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" />
-             <span className="text-sm font-medium text-gray-700 group-hover:text-red-500 transition-colors">Help</span>
+             <HelpCircle className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-red-500 transition-colors" />
+             <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-red-500 transition-colors">Help</span>
           </NavLink>
 
-          <div className="relative" ref={dropdownRef}>
-            <button 
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
-                isDropdownOpen ? 'bg-gray-100 text-red-500' : 'text-gray-700 hover:bg-gray-50'
-              }`}
+          <div className="relative flex items-center gap-4" ref={dropdownRef}>
+            <button
+              onClick={() => {
+                const currentTheme = useThemeStore.getState().theme;
+                useThemeStore.getState().setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+              }}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-slate-800 transition-colors"
             >
-              <div className={`p-1 rounded-full ${isAuthenticated ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+              {useThemeStore((s) => s.theme) === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+          
+            <div className="relative">
+              <button 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                  isDropdownOpen ? 'bg-slate-100 dark:bg-slate-800 text-red-500' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+              <div className={`p-1 rounded-full ${isAuthenticated ? 'bg-red-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
                 <User className="w-4 h-4" />
               </div>
               <span className="text-sm font-semibold">
@@ -120,11 +132,11 @@ const Header = () => {
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-[110] animate-in fade-in zoom-in duration-150 origin-top-right">
+              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-2xl py-2 z-[110] animate-in fade-in zoom-in duration-150 origin-top-right">
                 {!showLanguageList ? (
                   <ul role="menu">
                     {menuItems.map((item, index) => {
-                      if (item.divider) return <li key={index} className="h-px bg-gray-100 my-2 mx-2" />;
+                      if (item.divider) return <li key={index} className="h-px bg-slate-100 dark:bg-slate-800 my-2 mx-2" />;
                       return (
                         <li key={item.label} role="none">
                           <button
@@ -137,13 +149,13 @@ const Header = () => {
                               }
                             }}
                             className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all
-                              ${item.danger ? 'text-red-500 hover:bg-red-50' : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'}
+                              ${item.danger ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-red-500'}
                             `}
                           >
                             <span className="opacity-70">{item.icon}</span>
                             {item.label}
                             {item.label === 'Language' && (
-                              <span className="ml-auto text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-400 uppercase">
+                              <span className="ml-auto text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-400 uppercase">
                                 {i18n.language}
                               </span>
                             )}
@@ -154,8 +166,8 @@ const Header = () => {
                   </ul>
                 ) : (
                   <div className="animate-in slide-in-from-right-4 duration-200">
-                    <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Select Language</span>
+                    <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Select Language</span>
                        <button onClick={() => setShowLanguageList(false)} className="text-[10px] font-bold text-red-500 hover:underline">Back</button>
                     </div>
                     <ul className="py-1">
@@ -163,7 +175,7 @@ const Header = () => {
                         <li key={lang.code}>
                           <button
                             onClick={() => changeLanguage(lang.code)}
-                            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-red-500 transition-all"
+                            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-red-500 transition-all"
                           >
                             {lang.label}
                             {i18n.language === lang.code && <Check className="w-4 h-4 text-emerald-500" />}
@@ -175,6 +187,7 @@ const Header = () => {
                 )}
               </div>
             )}
+          </div>
           </div>
         </nav>
       </div>

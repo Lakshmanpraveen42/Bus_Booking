@@ -26,21 +26,21 @@ const CustomDatePicker = ({ selectedDate, onChange, minDate = startOfToday(), cl
 
   const renderHeader = () => (
     <div className="flex items-center justify-between mb-4 px-1">
-      <h2 className="font-bold text-gray-800 text-sm uppercase tracking-wider">
+      <h2 className="font-bold text-slate-800 dark:text-slate-200 text-sm uppercase tracking-wider">
         {format(currentMonth, 'MMMM yyyy')}
       </h2>
       <div className="flex gap-1">
         <button
           type="button"
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-          className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
+          className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
         <button
           type="button"
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
+          className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -53,7 +53,7 @@ const CustomDatePicker = ({ selectedDate, onChange, minDate = startOfToday(), cl
     return (
       <div className="grid grid-cols-7 mb-2">
         {days.map((day) => (
-          <div key={day} className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
+          <div key={day} className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">
             {day}
           </div>
         ))}
@@ -83,9 +83,9 @@ const CustomDatePicker = ({ selectedDate, onChange, minDate = startOfToday(), cl
               onClick={() => !isDisabled && handleDateClick(day)}
               className={`
                 relative p-2 text-sm font-bold cursor-pointer transition-all duration-200 rounded-lg text-center
-                ${!isCurrentMonth ? 'text-gray-200' : ''}
-                ${isDisabled ? 'text-gray-300 cursor-not-allowed opacity-50' : 'hover:bg-gray-50'}
-                ${isSelected ? 'bg-red-500 text-white font-extrabold shadow-md shadow-red-200 hover:bg-red-600' : 'text-gray-700'}
+                ${!isCurrentMonth ? 'text-slate-200 dark:text-slate-700' : ''}
+                ${isDisabled ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-50' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}
+                ${isSelected ? 'bg-red-500 text-white font-extrabold shadow-md shadow-red-200 dark:shadow-red-500/20 hover:bg-red-600' : 'text-slate-700 dark:text-slate-300'}
                 ${isToday && !isSelected ? 'border border-red-500 text-red-500' : ''}
               `}
             >
@@ -101,26 +101,26 @@ const CustomDatePicker = ({ selectedDate, onChange, minDate = startOfToday(), cl
     <div className={`relative w-full ${className}`} ref={containerRef}>
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 px-4 py-4 bg-white border-2 border-transparent focus-within:border-red-500 rounded-2xl shadow-sm cursor-pointer group transition-all"
+        className="flex items-center gap-3 px-4 py-4 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700/50 focus-within:border-red-500 rounded-2xl shadow-sm cursor-pointer group transition-all"
       >
-        <CalendarIcon className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" />
+        <CalendarIcon className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-red-500 transition-colors" />
         <div className="flex-1">
           <input
             readOnly
             value={selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''}
             placeholder="Select Date"
-            className="w-full bg-transparent text-gray-900 font-bold outline-none cursor-pointer placeholder:text-gray-300"
+            className="w-full bg-transparent text-slate-900 dark:text-white font-bold outline-none cursor-pointer placeholder:text-slate-300 dark:placeholder:text-slate-600"
           />
         </div>
       </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-3 p-5 bg-white border border-gray-100 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[999] min-w-[320px] animate-fade-in">
+        <div className="absolute top-full left-0 mt-3 p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-slate-900/50 z-[999] min-w-[320px] animate-fade-in">
           {renderHeader()}
           {renderDays()}
           {renderCells()}
           
-          <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center">
+          <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800/50 flex justify-between items-center">
             <button 
               type="button"
               onClick={() => { onChange(new Date()); setIsOpen(false); }}
@@ -131,7 +131,7 @@ const CustomDatePicker = ({ selectedDate, onChange, minDate = startOfToday(), cl
             <button 
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 transition-colors"
             >
               Close
             </button>

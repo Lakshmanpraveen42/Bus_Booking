@@ -24,6 +24,25 @@
              #0f172a;
 }
 
+.dark {
+  --background: #0f172a; /* Slate 900 */
+  --foreground: #f8fafc; /* Slate 50 */
+  --primary: #f43f5e;
+  --primary-hover: #fb7185; /* primary-400 */
+  --accent: #a78bfa; /* accent-400 */
+  --card: #1e293b; /* Slate 800 */
+  --card-border: #334155; /* Slate 700 */
+  --surface: #1e293b;
+  --muted: #94a3b8;
+  --muted-light: #cbd5e1;
+  --input-bg: #0f172a; /* Slate 900 */
+  --input-border: #334155; /* Slate 700 */
+  --header-bg: rgba(15, 23, 42, 0.8);
+  --hero-bg: radial-gradient(circle at 0% 0%, rgba(244, 63, 94, 0.1), transparent 50%),
+             radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08), transparent 50%),
+             #020617; /* Slate 950 */
+}
+
 
 
 @layer base {

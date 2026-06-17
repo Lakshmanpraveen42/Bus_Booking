@@ -9,23 +9,22 @@ const AdminSidebar = ({ onClose }) => {
 
   const menuItems = [
     { icon: <LayoutDashboard className="w-5 h-5" />, label: 'Overview', path: '/admin' },
-    { icon: <Map className="w-5 h-5" />, label: 'Route Templates', path: '/admin/routes' },
     { icon: <Ticket className="w-5 h-5" />, label: 'Trip Scheduler', path: '/admin/trips' },
     { icon: <Bus className="w-5 h-5" />, label: 'Fleet Manager', path: '/admin/buses' },
     { icon: <Users className="w-5 h-5" />, label: 'User Database', path: '/admin/users' },
   ];
 
   return (
-    <div className="w-72 bg-slate-950 min-h-screen flex flex-col border-r border-white/5 sticky top-0">
+    <div className="w-72 bg-white dark:bg-slate-950 min-h-screen flex flex-col border-r border-slate-200 dark:border-white/5 sticky top-0 transition-colors">
       {/* Admin Logo */}
       <div className="p-8 pb-12 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
           <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
             <Bus className="w-6 h-6 text-white" />
           </div>
-          <span className="text-white font-black text-2xl tracking-tight">SmartBus</span>
+          <span className="text-slate-900 dark:text-white font-black text-2xl tracking-tight transition-colors">SmartBus</span>
         </Link>
-        <button onClick={onClose} className="lg:hidden p-2 text-slate-400 hover:text-white transition-colors">
+        <button onClick={onClose} className="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
            <X className="w-6 h-6" />
         </button>
       </div>
@@ -46,7 +45,7 @@ const AdminSidebar = ({ onClose }) => {
               className={`flex items-center gap-4 px-4 py-4 rounded-2xl font-bold transition-all duration-300 group ${
                 isActive 
                   ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20' 
-                  : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <div className={`transition-transform duration-500 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
@@ -59,20 +58,20 @@ const AdminSidebar = ({ onClose }) => {
       </nav>
 
       {/* Bottom Actions */}
-      <div className="p-6 border-t border-white/5 bg-slate-950/50">
-        <div className="flex items-center gap-3 p-4 mb-4 bg-white/5 rounded-2xl">
-          <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-bold text-white text-xs border border-white/10">
+      <div className="p-6 border-t border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-950/50 transition-colors">
+        <div className="flex items-center gap-3 p-4 mb-4 bg-slate-100 dark:bg-white/5 rounded-2xl transition-colors">
+          <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-700 dark:text-white text-xs border border-slate-300 dark:border-white/10 transition-colors">
             AD
           </div>
           <div>
-            <p className="text-white text-sm font-bold leading-none">Admin User</p>
+            <p className="text-slate-900 dark:text-white text-sm font-bold leading-none transition-colors">Admin User</p>
             <p className="text-slate-500 text-[10px] uppercase font-black mt-1 tracking-widest">Master Control</p>
           </div>
         </div>
         
         <button 
           onClick={logout}
-          className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-bold hover:text-white hover:bg-white/5 rounded-xl transition-all"
+          className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 font-bold hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
         >
           <LogOut className="w-5 h-5 text-rose-500" />
           Log Out

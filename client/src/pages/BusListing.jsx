@@ -121,7 +121,7 @@ const BusListing = () => {
   }, [searchParams]);
 
   return (
-    <PageWrapper className="bg-slate-50 min-h-screen pt-[76px]">
+    <PageWrapper className="bg-slate-50 dark:bg-slate-950 min-h-screen pt-[76px] transition-colors">
       
       {/* 🔴 SEARCH HEADER */}
       <SearchHeader />
@@ -130,9 +130,9 @@ const BusListing = () => {
         
         {/* 🟢 REFERENCE-MATCHED FILTERS SIDEBAR */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white rounded-xl border border-slate-100 p-6 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm transition-colors">
              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Filters</h3>
+                <h3 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Filters</h3>
                 <button 
                   onClick={resetFilters}
                   className="text-[10px] font-bold text-rose-500 uppercase tracking-widest hover:underline"
@@ -188,8 +188,8 @@ const BusListing = () => {
                 <p className="text-[10px] font-bold text-primary-500 mt-2 cursor-pointer">+ More</p>
              </FilterSection>
 
-             <div className="mt-8 pt-8 border-t border-slate-50">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex justify-between">
+             <div className="mt-8 pt-8 border-t border-slate-50 dark:border-slate-800">
+                <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6 flex justify-between">
                   Price Range
                   <span className="text-rose-500">Up to ₹{filters.priceRange[1]}</span>
                 </h4>
@@ -201,12 +201,12 @@ const BusListing = () => {
                     step="100"
                     value={filters.priceRange[1]}
                     onChange={(e) => setFilters(prev => ({ ...prev, priceRange: [0, parseInt(e.target.value)] }))}
-                    className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-rose-500"
+                    className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-rose-500"
                   />
                 </div>
                 <div className="flex items-center justify-between mt-4">
-                   <span className="text-[10px] font-bold text-slate-500">₹200</span>
-                   <span className="text-[10px] font-bold text-slate-500">₹5000</span>
+                   <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">₹200</span>
+                   <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">₹5000</span>
                 </div>
              </div>
           </div>
@@ -215,13 +215,13 @@ const BusListing = () => {
         {/* 🔵 LISTING AREA */}
         <div className="lg:col-span-9">
           <div className="flex items-center justify-between mb-6">
-             <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{filteredBuses.length} BUSES FOUND</h2>
+             <h2 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">{filteredBuses.length} BUSES FOUND</h2>
              <div className="flex items-center gap-4">
-                <span className="text-[11px] font-bold text-slate-400">Sort by:</span>
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">Sort by:</span>
                 <select 
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-[11px] font-bold text-slate-600 outline-none cursor-pointer"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-[11px] font-bold text-slate-600 dark:text-slate-300 outline-none cursor-pointer transition-colors"
                 >
                    <option>Price - Low to High</option>
                    <option>Departure Time</option>
@@ -253,7 +253,7 @@ const BusListing = () => {
 
 const FilterSection = ({ title, children }) => (
   <div className="mb-8 last:mb-0">
-    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{title}</h4>
+    <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">{title}</h4>
     <div className="space-y-3">{children}</div>
   </div>
 );
@@ -261,12 +261,12 @@ const FilterSection = ({ title, children }) => (
 const FilterOption = ({ label, count, checked, onClick }) => (
   <div className="flex items-center justify-between group cursor-pointer" onClick={onClick}>
     <div className="flex items-center gap-3">
-       <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${checked ? 'bg-rose-500 border-rose-500' : 'bg-white border-slate-200 group-hover:border-rose-300'}`}>
+       <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${checked ? 'bg-rose-500 border-rose-500' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 group-hover:border-rose-300 dark:group-hover:border-rose-500/50'}`}>
           {checked && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
        </div>
-       <span className={`text-[11px] font-bold ${checked ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}`}>{label}</span>
+       <span className={`text-[11px] font-bold ${checked ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200'}`}>{label}</span>
     </div>
-    <span className="text-[10px] font-bold text-slate-300">{count}</span>
+    <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600">{count}</span>
   </div>
 );
 
