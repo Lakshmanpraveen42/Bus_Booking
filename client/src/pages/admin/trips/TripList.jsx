@@ -162,13 +162,13 @@ const TripList = () => {
       header: 'Schedule Details',
       render: (row) => (
         <div className="flex items-center gap-4">
-           <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-slate-900/10">
+           <div className="w-12 h-12 bg-slate-900 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-slate-900/10 dark:shadow-none transition-colors">
               <Calendar className="w-6 h-6" />
            </div>
            <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded tracking-widest">#{row.id}</span>
-                <p className="text-sm font-black text-slate-800 leading-none">{formatDate(row.departure_time)}</p>
+                <span className="text-[10px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded tracking-widest transition-colors">#{row.id}</span>
+                <p className="text-sm font-black text-slate-800 dark:text-slate-200 leading-none transition-colors">{formatDate(row.departure_time)}</p>
               </div>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
                  <Clock className="w-2.5 h-2.5" /> {formatTime12h(row.departure_time)} Departure
@@ -181,7 +181,7 @@ const TripList = () => {
       header: 'Route & Assignment',
       render: (row) => (
         <div className="space-y-2">
-           <div className="flex items-center gap-2 text-xs font-black text-slate-900">
+           <div className="flex items-center gap-2 text-xs font-black text-slate-900 dark:text-slate-100 transition-colors">
               {row.source} <ArrowRight className="w-3 h-3 text-primary-500" /> {row.destination}
            </div>
            <div className="flex items-center gap-2">
@@ -208,13 +208,13 @@ const TripList = () => {
         <div className="flex items-center justify-end gap-2 pr-2">
            <button 
              onClick={() => handleEdit(row)}
-             className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-primary-500 hover:text-white transition-all flex items-center justify-center"
+             className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 transition-all flex items-center justify-center"
            >
              <Pencil className="w-4 h-4" />
            </button>
            <button 
              onClick={() => handleDelete(row.id)}
-             className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center"
+             className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-500 hover:text-white dark:hover:bg-rose-500 transition-all flex items-center justify-center"
            >
              <Trash2 className="w-4 h-4" />
            </button>
@@ -233,7 +233,7 @@ const TripList = () => {
               placeholder="Search by city or vehicle..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-[2rem] py-4 pl-12 pr-6 text-sm font-bold focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 transition-all outline-none"
+              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] py-4 pl-12 pr-6 text-sm font-bold text-slate-900 dark:text-slate-100 focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500 transition-all outline-none"
             />
          </div>
          <button 

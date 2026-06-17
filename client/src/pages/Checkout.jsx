@@ -139,8 +139,8 @@ const Checkout = () => {
             <ArrowLeft className="w-5 h-5 text-slate-600" />
           </button>
           <div>
-            <h1 className="text-3xl font-black text-slate-900 leading-none">Confirm Booking</h1>
-            <p className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Step 3 of 4: Finalize Itinerary</p>
+            <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 leading-none transition-colors">Confirm Booking</h1>
+            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-2 uppercase tracking-widest transition-colors">Step 3 of 4: Finalize Itinerary</p>
           </div>
         </div>
 
@@ -169,7 +169,7 @@ const Checkout = () => {
             {/* Contact Details */}
             <section className="space-y-6">
               <SectionHeader title="Contact Information" icon={<Mail className="w-4 h-4" />} />
-              <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm ring-1 ring-slate-50">
+              <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm ring-1 ring-slate-50 dark:ring-slate-900 transition-colors">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <Input 
                     label="Mobile Number" 
@@ -204,10 +204,10 @@ const Checkout = () => {
 
           {/* RIGHT: STICKY SUMMARY */}
           <div className="lg:col-span-1 sticky top-10 h-fit">
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl p-1 overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl p-1 overflow-hidden transition-colors">
                <div className="p-8 space-y-8">
-                 <div className="pb-6 border-b border-slate-50">
-                    <h3 className="text-xl font-black text-slate-900 leading-tight">{selectedBus?.busName}</h3>
+                 <div className="pb-6 border-b border-slate-50 dark:border-slate-800 transition-colors">
+                    <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 leading-tight transition-colors">{selectedBus?.busName}</h3>
                     <div className="flex items-center gap-2 mt-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
                        <MapPin className="w-3 h-3 text-primary-500" /> {selectedBus?.busType}
                     </div>
@@ -220,8 +220,8 @@ const Checkout = () => {
                  </div>
 
                  {/* Price Breakdown */}
-                 <div className="pt-6 border-t border-slate-50 space-y-3">
-                    <div className="flex justify-between text-sm font-bold text-slate-500">
+                 <div className="pt-6 border-t border-slate-50 dark:border-slate-800 transition-colors space-y-3">
+                    <div className="flex justify-between text-sm font-bold text-slate-500 dark:text-slate-400 transition-colors">
                       <span>Base Fare ({passengers.length} Seats)</span>
                       <span>{formatPrice(baseFare)}</span>
                     </div>
@@ -273,7 +273,7 @@ const Checkout = () => {
 
 const SectionHeader = ({ title, icon }) => (
   <div className="flex items-center gap-3 ml-2">
-    <div className="w-8 h-8 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center">
+    <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center transition-colors">
       {icon}
     </div>
     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{title}</h3>
@@ -281,9 +281,9 @@ const SectionHeader = ({ title, icon }) => (
 );
 
 const PassengerCard = ({ data, onChange, errors }) => (
-  <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm ring-1 ring-slate-50 transition-all hover:shadow-md animate-scale-in">
+  <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm ring-1 ring-slate-50 dark:ring-slate-900 transition-all hover:shadow-md animate-scale-in">
     <div className="flex items-center gap-3 mb-6">
-      <div className="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-black tracking-widest text-slate-500">SEAT {data.seat_number}</div>
+      <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black tracking-widest text-slate-500 dark:text-slate-400 transition-colors">SEAT {data.seat_number}</div>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
       <div className="md:col-span-6">
@@ -310,8 +310,8 @@ const PassengerCard = ({ data, onChange, errors }) => (
         <select 
           value={data.gender}
           onChange={(e) => onChange('gender', e.target.value)}
-          className={`w-full h-12 px-5 bg-slate-50/50 border rounded-xl text-sm font-bold focus:outline-none transition-all appearance-none
-            ${errors.gender ? 'border-rose-300 ring-4 ring-rose-50' : 'border-slate-100 focus:border-primary-500 focus:bg-white'}
+          className={`w-full h-12 px-5 bg-slate-50/50 dark:bg-slate-800 border rounded-xl text-sm dark:text-white font-bold focus:outline-none transition-all appearance-none
+            ${errors.gender ? 'border-rose-300 ring-4 ring-rose-50 dark:ring-rose-900/30' : 'border-slate-100 dark:border-slate-700 focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900'}
           `}
         >
           <option value="">Select</option>
@@ -325,17 +325,17 @@ const PassengerCard = ({ data, onChange, errors }) => (
 );
 
 const InsuranceSection = ({ enabled, onToggle, count }) => (
-  <div className={`bg-white p-8 rounded-[2rem] border transition-all cursor-pointer flex items-center justify-between shadow-sm
-    ${enabled ? 'border-emerald-500 ring-4 ring-emerald-50 bg-emerald-50/10' : 'border-slate-100 hover:border-emerald-300'}
+  <div className={`bg-white dark:bg-slate-900 p-8 rounded-[2rem] border transition-all cursor-pointer flex items-center justify-between shadow-sm
+    ${enabled ? 'border-emerald-500 ring-4 ring-emerald-50 dark:ring-emerald-900/30 bg-emerald-50/10' : 'border-slate-100 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700'}
   `} onClick={onToggle}>
     <div className="flex items-start gap-5">
       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors
-        ${enabled ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/20' : 'bg-slate-100 text-slate-400'}
+        ${enabled ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}
       `}>
         <ShieldCheck className="w-6 h-6" />
       </div>
       <div>
-        <p className="text-sm font-black text-slate-900 group-hover:text-emerald-600">Travel Insurance</p>
+        <p className="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors">Travel Insurance</p>
         <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">₹15 per passenger • Basic trip protection</p>
       </div>
     </div>
@@ -356,11 +356,11 @@ const Input = ({ label, icon, error, ...props }) => (
       <input 
         {...props}
         onChange={(e) => props.onChange(e.target.value)}
-        className={`w-full h-12 outline-none rounded-xl text-sm font-bold transition-all
+        className={`w-full h-12 outline-none rounded-xl text-sm font-bold dark:text-white transition-all
           ${icon ? 'pl-11 pr-4' : 'px-5'}
           ${error 
-            ? 'bg-rose-50/30 border border-rose-300 ring-4 ring-rose-50 text-rose-900' 
-            : 'bg-slate-50/50 border border-slate-100 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-50'}
+            ? 'bg-rose-50/30 dark:bg-rose-900/10 border border-rose-300 dark:border-rose-700 ring-4 ring-rose-50 dark:ring-rose-900/30 text-rose-900 dark:text-rose-400' 
+            : 'bg-slate-50/50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary-50 dark:focus:ring-primary-900/30'}
         `}
       />
     </div>
@@ -370,7 +370,7 @@ const Input = ({ label, icon, error, ...props }) => (
 const SummaryPoint = ({ label, value, time }) => (
   <div className="flex justify-between items-start">
     <div>
-      <p className="text-xs font-black text-slate-800">{value || '--'}</p>
+      <p className="text-xs font-black text-slate-800 dark:text-slate-200 transition-colors">{value || '--'}</p>
       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">{label}</p>
     </div>
     <p className="text-xs font-bold text-slate-400">{time || '--'}</p>
